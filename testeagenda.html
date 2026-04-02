@@ -3,7 +3,8 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Task Agenda</title>
+  <title>WeTasks - gaveblue.com</title>
+  <meta name="description" content="WeTasks - Sua agenda pessoal desenvolvida por gaveblue.com. Organize suas tarefas com facilidade e aumente sua produtividade.">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
@@ -50,49 +51,55 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
   <style>body { box-sizing: border-box; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full"><button onclick="openTaskModal()" id="fab-button" style="position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;border:none;box-shadow:0 4px 16px rgba(37,99,235,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:all .2s" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'"><i data-lucide="plus" style="width:24px;height:24px"></i></button>
+ <body class="h-full">
+  <button onclick="openTaskModal()" id="fab-button" style="position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;border:none;box-shadow:0 4px 16px rgba(37,99,235,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:all .2s" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'"><i data-lucide="plus" style="width:24px;height:24px"></i></button>
   <div class="app-wrapper" id="app">
    <div id="toast-container"></div>
    <header style="background:linear-gradient(135deg,#2563EB 0%,#3B82F6 50%,#60A5FA 100%);color:#fff;padding:20px 20px 60px;position:relative">
     <div style="max-width:600px;margin:0 auto">
-     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="display:flex;flex-direction:column;gap:3px">
-       <p style="font-size:13px;opacity:.8" id="greeting-text">Olá! Bem-vindo 👋</p>
-       <h1 style="font-size:22px;font-weight:800;letter-spacing:-.3px" id="app-title">Minha Agenda</h1>
+     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;flex:1;padding-left:-20px;margin-right:24px"><img src="https://imgur.com/QVTXWdN.png" alt="Logo" style="height:48px;width:auto;object-fit:contain;margin-left:-20px" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.display='none';">
+       <div style="font-size:14px;font-weight:600;opacity:.95" id="greeting-text"></div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;position:relative">
-       <button onclick="toggleNotifications()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;position:relative;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="bell" style="width:20px;height:20px"></i><span id="notification-badge" style="position:absolute;top:-4px;right:-4px;background:#FF6B6B;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;display:none"></span></button> <button onclick="toggleSettings()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="settings" style="width:20px;height:20px"></i></button> <button onclick="goToWebsite()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="log-out" style="width:20px;height:20px"></i></button>
+      <div style="display:flex;gap:10px;align-items:center;position:relative"><button onclick="toggleNotifications()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;position:relative;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="bell" style="width:20px;height:20px"></i><span id="notification-badge" style="position:absolute;top:-4px;right:-4px;background:#FF6B6B;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;display:none"></span></button> <button onclick="toggleSettings()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="settings" style="width:20px;height:20px"></i></button> <button onclick="goToWebsite()" style="background:rgba(255,255,255,.15);border:none;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'"><i data-lucide="log-out" style="width:20px;height:20px"></i></button>
       </div>
      </div>
-     <div style="display:flex;gap:6px;align-items:center;font-size:14px;opacity:.9"><i data-lucide="calendar" style="width:16px;height:16px"></i> <span id="header-date"></span> <span style="opacity:.6">•</span> <span id="header-time"></span>
+     <div style="display:flex;gap:6px;align-items:center;font-size:14px;opacity:.9">
+      <i data-lucide="calendar" style="width:16px;height:16px"></i> <span id="header-date"></span> <span style="opacity:.6">•</span> <span id="header-time"></span>
      </div>
     </div>
    </header>
    <div style="max-width:600px;margin:16px auto 0;padding:0 16px">
-    <div style="display:flex;gap:6px;background:var(--surface);border-radius:14px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)"><button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tarefas</button> <button class="tab-btn" onclick="switchTab('calendar')" id="tab-calendar">Calendário</button> <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
+    <div style="display:flex;gap:6px;background:var(--surface);border-radius:14px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+     <button class="tab-btn active" onclick="switchTab('tasks')" id="tab-tasks">Tarefas</button> <button class="tab-btn" onclick="switchTab('calendar')" id="tab-calendar">Calendário</button> <button class="tab-btn" onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
     </div>
    </div>
    <div id="view-tasks" style="max-width:600px;margin:12px auto 100px;padding:0 16px">
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center"><button onclick="changeTaskDate(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+     <button onclick="changeTaskDate(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
      <div style="flex:1;text-align:center;font-weight:700;font-size:14px" id="tasks-date-label">
       Hoje
      </div><button onclick="changeTaskDate(1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
     </div>
-    <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding:4px 0;scroll-behavior:smooth;-webkit-overflow-scrolling:touch"><button class="tab-btn active" onclick="filterTasks('all')" data-filter="all" style="font-size:12px;white-space:nowrap">Todas</button> <button class="tab-btn" onclick="filterTasks('pending')" data-filter="pending" style="font-size:12px;white-space:nowrap">Pendentes</button> <button class="tab-btn" onclick="filterTasks('done')" data-filter="done" style="font-size:12px;white-space:nowrap">Concluídas</button> <button class="tab-btn" onclick="filterTasks('urgent')" data-filter="urgent" style="font-size:12px;white-space:nowrap;background:rgba(239,68,68,.1);color:#EF4444">Urgentes</button> <button class="tab-btn" onclick="filterTasks('high')" data-filter="high" style="font-size:12px;white-space:nowrap;background:rgba(255,140,66,.1);color:#FF8C42">Alta</button> <button class="tab-btn" onclick="filterTasks('medium')" data-filter="medium" style="font-size:12px;white-space:nowrap;background:rgba(245,158,11,.1);color:#F59E0B">Média</button> <button class="tab-btn" onclick="filterTasks('low')" data-filter="low" style="font-size:12px;white-space:nowrap;background:rgba(16,185,129,.1);color:#10B981">Baixa</button>
+    <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding:4px 0;scroll-behavior:smooth;-webkit-overflow-scrolling:touch">
+     <button class="tab-btn active" onclick="filterTasks('all')" data-filter="all" style="font-size:12px;white-space:nowrap">Todas</button> <button class="tab-btn" onclick="filterTasks('pending')" data-filter="pending" style="font-size:12px;white-space:nowrap">Pendentes</button> <button class="tab-btn" onclick="filterTasks('done')" data-filter="done" style="font-size:12px;white-space:nowrap">Concluídas</button> <button class="tab-btn" onclick="filterTasks('urgent')" data-filter="urgent" style="font-size:12px;white-space:nowrap;background:rgba(239,68,68,.1);color:#EF4444">Urgentes</button> <button class="tab-btn" onclick="filterTasks('high')" data-filter="high" style="font-size:12px;white-space:nowrap;background:rgba(255,140,66,.1);color:#FF8C42">Alta</button> <button class="tab-btn" onclick="filterTasks('medium')" data-filter="medium" style="font-size:12px;white-space:nowrap;background:rgba(245,158,11,.1);color:#F59E0B">Média</button> <button class="tab-btn" onclick="filterTasks('low')" data-filter="low" style="font-size:12px;white-space:nowrap;background:rgba(16,185,129,.1);color:#10B981">Baixa</button>
     </div>
     <div id="tasks-list"></div>
    </div>
    <div id="view-calendar" style="max-width:600px;margin:12px auto 100px;padding:0 16px;display:none">
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center"><button onclick="changeTaskDate(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+     <button onclick="changeTaskDate(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
      <div style="flex:1;text-align:center;font-weight:700;font-size:14px" id="cal-date-label">
       Hoje
      </div><button onclick="changeTaskDate(1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
     </div>
     <div class="card" style="padding:20px;margin-bottom:16px">
-     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><button onclick="changeMonth(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <button onclick="changeMonth(-1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
       <h3 style="font-weight:700;font-size:16px" id="cal-month-label"></h3><button onclick="changeMonth(1)" class="btn btn-ghost" style="padding:8px"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
      </div>
-     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:8px"><span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Dom</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Seg</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Ter</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Qua</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Qui</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Sex</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Sáb</span>
+     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:8px">
+      <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Dom</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Seg</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Ter</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Qua</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Qui</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Sex</span> <span style="font-size:11px;font-weight:600;color:var(--secondary);padding:8px 4px">Sáb</span>
      </div>
      <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
     </div>
@@ -103,12 +110,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
     <h2 style="font-weight:800;font-size:18px;margin-bottom:16px;color:var(--text)">Resumo da Agenda</h2><!-- AVISO DE LIMITE (SEMPRE VISÍVEL) -->
     <div style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border-left:4px solid #F59E0B;border-radius:12px;animation:slideDown .3s ease;box-shadow:0 4px 12px rgba(245,158,11,.15)">
      <div style="display:flex;gap:12px;align-items:flex-start">
-      <div style="width:40px;height:40px;border-radius:10px;background:#F59E0B;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-       <i data-lucide="alert-triangle" style="width:22px;height:22px;color:#fff"></i>
+      <div style="width:40px;height:40px;border-radius:10px;background:#F59E0B;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i data-lucide="alert-triangle" style="width:22px;height:22px;color:#fff"></i>
       </div>
       <div style="flex:1">
        <p style="font-weight:800;color:#B45309;font-size:14px;margin-bottom:6px">💡 Dica de Manutenção</p>
-       <p style="font-size:13px;color:#B45309;margin-bottom:12px;line-height:1.5">Você tem <strong id="warning-count">0</strong> tarefas. Para manter tudo rápido e fluido, recomendamos <strong>limpar tarefas concluídas quando atingir 1.000</strong>. Seu sistema agradece! 🚀</p><button onclick="requestClearCompleted()" class="btn" style="padding:8px 16px;background:#B45309;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;transition:all .2s;cursor:pointer" onmouseover="this.style.background='#92400e'" onmouseout="this.style.background='#B45309'"><i data-lucide="trash-2" style="width:15px;height:15px"></i> Limpar Concluídas</button>
+       <p style="font-size:13px;color:#B45309;margin-bottom:12px;line-height:1.5">Você tem <strong id="warning-count">0</strong> tarefas. Para manter tudo rápido e fluido, recomendamos <strong>limpar tarefas concluídas quando atingir 1.000</strong>. Seu sistema agradece! 🚀</p>
+       <div style="display:flex;justify-content:center;width:100%"><button onclick="requestClearCompleted()" class="btn" style="padding:8px 16px;background:#B45309;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;transition:all .2s;cursor:pointer" onmouseover="this.style.background='#92400e'" onmouseout="this.style.background='#B45309'"><i data-lucide="trash-2" style="width:15px;height:15px"></i> Limpar Concluídas</button>
+       </div>
       </div>
      </div>
     </div><!-- CARDS DE RESUMO -->
@@ -136,14 +144,17 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
     </div><!-- DISTRIBUIÇÃO POR PRIORIDADE -->
     <h3 style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--text)">Distribuição por Prioridade</h3>
     <div class="card fade-in" style="padding:16px;margin-bottom:20px">
-     <div style="display:flex;flex-direction:column;gap:12px" id="priority-dist"><!-- Será renderizado via JS -->
+     <div style="display:flex;flex-direction:column;gap:12px" id="priority-dist">
+      <!-- Será renderizado via JS -->
      </div>
     </div><!-- CATEGORIAS DE STATUS -->
     <h3 style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--text)">Tarefas por Categoria</h3>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px" id="category-cards"><!-- Será renderizado via JS -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px" id="category-cards">
+     <!-- Será renderizado via JS -->
     </div><!-- ÚLTIMAS TAREFAS -->
     <h3 style="font-weight:700;font-size:15px;margin-bottom:12px;color:var(--text)">Últimas Tarefas Criadas</h3>
-    <div id="recent-tasks" style="display:flex;flex-direction:column;gap:10px"><!-- Será renderizado via JS -->
+    <div id="recent-tasks" style="display:flex;flex-direction:column;gap:10px">
+     <!-- Será renderizado via JS -->
     </div>
    </div>
    <div id="settings-panel" style="display:none;position:fixed;top:0;right:0;bottom:0;width:100%;max-width:360px;background:var(--surface);z-index:60;box-shadow:-4px 0 24px rgba(0,0,0,.1);overflow:auto" class="slide-up">
@@ -152,18 +163,15 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
       <h2 style="font-weight:800;font-size:18px">Configurações</h2><button onclick="toggleSettings()" class="btn btn-ghost" style="padding:8px"><i data-lucide="x" style="width:20px;height:20px"></i></button>
      </div>
      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #F1F5F9">
-      <p style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:8px">Editar nome</p>
-      <div style="display:flex;gap:8px"><input type="text" id="settings-name-input" placeholder="Digite seu nome" style="border:1.5px solid #E2E8F0;border-radius:12px;padding:10px 14px;font-family:inherit;font-size:14px;flex:1;background:var(--surface);color:var(--text)"> <button onclick="updateUserName()" class="btn btn-primary" style="padding:10px 16px"><i data-lucide="pencil" style="width:16px;height:16px"></i></button>
-      </div>
-     </div>
-     <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #F1F5F9">
       <p style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:12px">Tema</p>
-      <div style="display:flex;gap:8px"><button onclick="setTheme('light')" id="theme-light" class="btn" style="flex:1;justify-content:center;border:2px solid #E2E8F0;background:transparent;color:var(--secondary)"><i data-lucide="sun" style="width:16px;height:16px"></i> Claro</button> <button onclick="setTheme('dark')" id="theme-dark" class="btn" style="flex:1;justify-content:center;border:2px solid #E2E8F0;background:transparent;color:var(--secondary)"><i data-lucide="moon" style="width:16px;height:16px"></i> Escuro</button>
+      <div style="display:flex;gap:8px">
+       <button onclick="setTheme('light')" id="theme-light" class="btn" style="flex:1;justify-content:center;border:2px solid #E2E8F0;background:transparent;color:var(--secondary)"><i data-lucide="sun" style="width:16px;height:16px"></i> Claro</button> <button onclick="setTheme('dark')" id="theme-dark" class="btn" style="flex:1;justify-content:center;border:2px solid #E2E8F0;background:transparent;color:var(--secondary)"><i data-lucide="moon" style="width:16px;height:16px"></i> Escuro</button>
       </div>
      </div>
      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #F1F5F9">
       <p style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:10px">Dados</p>
-      <div style="display:flex;flex-direction:column;gap:8px"><button onclick="exportTasks()" class="btn btn-ghost" style="width:100%;justify-content:center;border:1.5px solid #E2E8F0;font-size:12px;border-radius:12px"><i data-lucide="download" style="width:14px;height:14px"></i> Exportar</button> <button onclick="importTasks()" class="btn btn-ghost" style="width:100%;justify-content:center;border:1.5px solid #E2E8F0;font-size:12px;border-radius:12px"><i data-lucide="upload" style="width:14px;height:14px"></i> Importar</button> <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
+      <div style="display:flex;flex-direction:column;gap:8px">
+       <button onclick="exportTasks()" class="btn btn-ghost" style="width:100%;justify-content:center;border:1.5px solid #E2E8F0;font-size:12px;border-radius:12px"><i data-lucide="download" style="width:14px;height:14px"></i> Exportar</button> <button onclick="importTasks()" class="btn btn-ghost" style="width:100%;justify-content:center;border:1.5px solid #E2E8F0;font-size:12px;border-radius:12px"><i data-lucide="upload" style="width:14px;height:14px"></i> Importar</button> <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
       </div>
      </div>
      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #F1F5F9">
@@ -174,10 +182,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
      </div>
      <div style="margin-top:20px;padding-top:20px;border-top:1px solid #F1F5F9">
       <p style="font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:10px">Sobre</p>
-      <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px"><strong>📋 Task Agenda</strong></p>
-      <p style="font-size:12px;color:var(--secondary);line-height:1.6;margin-bottom:12px">Sua agenda pessoal criada com dedicação e amor. Organizar nunca foi tão fácil.</p>
-      <p style="font-size:11px;color:var(--secondary);margin-bottom:8px"><strong>Desenvolvido e criado por:</strong> <a href="https://gaveblue.com" target="_blank" rel="noopener noreferrer" style="color:var(--primary);text-decoration:none;font-weight:600">gaveblue.com</a></p>
-      <p style="font-size:11px;color:var(--secondary)">Desenvolvido com ❤️ para sua produtividade</p>
+      <div style="display:flex;justify-content:center;margin-bottom:16px">
+       <div style="width:240px;height:80px;border-radius:16px;background:linear-gradient(135deg,#2563EB 0%,#3B82F6 50%,#60A5FA 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,99,235,.2)"><img src="https://imgur.com/QVTXWdN.png" alt="Logo WeTasks" style="height:50px;width:auto;object-fit:contain" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.display='none';">
+       </div>
+      </div>
+      <p style="font-size:12px;color:var(--secondary);line-height:1.6;margin-bottom:12px;text-align:center">Sua agenda pessoal criada com dedicação e amor. Organizar nunca foi tão fácil.</p>
+      <p style="font-size:11px;color:var(--secondary);margin-bottom:8px;text-align:center"><strong>Desenvolvido e criado por:</strong> <a href="https://gaveblue.com" target="_blank" rel="noopener noreferrer" style="color:var(--primary);text-decoration:none;font-weight:600">gaveblue.com</a></p>
+      <p style="font-size:11px;color:var(--secondary);text-align:center">Desenvolvido com ❤️ para sua produtividade</p>
      </div>
     </div>
    </div>
@@ -191,21 +202,25 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
    <div id="notifications-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:60" onclick="toggleNotifications()"></div>
    <div id="delete-modal" class="modal-overlay" style="display:none;z-index:220" onclick="if(event.target===this)closeDeleteModal()">
     <div class="modal-content slide-up" style="max-width:380px;text-align:center">
-     <div style="width:56px;height:56px;border-radius:16px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="trash-2" style="width:24px;height:24px;color:var(--urgent)"></i>
+     <div style="width:56px;height:56px;border-radius:16px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <i data-lucide="trash-2" style="width:24px;height:24px;color:var(--urgent)"></i>
      </div>
      <h3 style="font-weight:700;font-size:17px;margin-bottom:8px">Excluir tarefa?</h3>
      <p style="font-size:13px;color:var(--secondary);margin-bottom:20px" id="delete-task-name"></p>
-     <div style="display:flex;gap:10px;justify-content:center"><button onclick="closeDeleteModal()" class="btn btn-ghost" style="border-radius:14px">Cancelar</button> <button onclick="confirmDelete()" class="btn btn-danger" style="border-radius:14px"><i data-lucide="trash-2" style="width:14px;height:14px"></i> Excluir</button>
+     <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="closeDeleteModal()" class="btn btn-ghost" style="border-radius:14px">Cancelar</button> <button onclick="confirmDelete()" class="btn btn-danger" style="border-radius:14px"><i data-lucide="trash-2" style="width:14px;height:14px"></i> Excluir</button>
      </div>
     </div>
    </div>
    <div id="complete-modal" class="modal-overlay" style="display:none;z-index:220" onclick="if(event.target===this)closeCompleteModal()">
     <div class="modal-content slide-up" style="max-width:380px;text-align:center">
-     <div style="width:56px;height:56px;border-radius:16px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="check-circle" style="width:24px;height:24px;color:var(--low)"></i>
+     <div style="width:56px;height:56px;border-radius:16px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <i data-lucide="check-circle" style="width:24px;height:24px;color:var(--low)"></i>
      </div>
      <h3 style="font-weight:700;font-size:17px;margin-bottom:8px" id="complete-modal-title">Concluir tarefa?</h3>
      <p style="font-size:13px;color:var(--secondary);margin-bottom:20px" id="complete-task-name"></p>
-     <div style="display:flex;gap:10px;justify-content:center"><button onclick="closeCompleteModal()" class="btn btn-ghost" style="border-radius:14px">Cancelar</button> <button onclick="confirmComplete()" class="btn btn-primary" style="border-radius:14px"><i data-lucide="check" style="width:14px;height:14px"></i> Confirmar</button>
+     <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="closeCompleteModal()" class="btn btn-ghost" style="border-radius:14px">Cancelar</button> <button onclick="confirmComplete()" class="btn btn-primary" style="border-radius:14px"><i data-lucide="check" style="width:14px;height:14px"></i> Confirmar</button>
      </div>
     </div>
    </div>
@@ -214,38 +229,30 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)
      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
       <h2 style="font-weight:800;font-size:20px;letter-spacing:-.3px" id="modal-title">Nova Tarefa</h2><button onclick="closeTaskModal()" class="btn btn-ghost" style="padding:8px"><i data-lucide="x" style="width:20px;height:20px"></i></button>
      </div>
-     <form id="task-form" onsubmit="event.preventDefault(); submitForm();"><input type="hidden" id="task-id">
-      <div style="display:flex;flex-direction:column;gap:18px">
-       <!-- TÍTULO -->
-       <div>
-        <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Título da Tarefa *</label> <input type="text" id="f-title" required placeholder="O que você precisa fazer?" style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:15px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
+     <form id="task-form" onsubmit="event.preventDefault(); submitForm();">
+      <input type="hidden" id="task-id">
+      <div style="display:flex;flex-direction:column;gap:18px"><!-- TÍTULO -->
+       <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Título da Tarefa *</label> <input type="text" id="f-title" required placeholder="O que você precisa fazer?" style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:15px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
        </div><!-- DESCRIÇÃO -->
-       <div>
-        <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Descrição</label> <textarea id="f-desc" rows="3" placeholder="Adicione mais detalhes sobre a tarefa..." style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);resize:vertical;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'"></textarea>
+       <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Descrição</label> <textarea id="f-desc" rows="3" placeholder="Adicione mais detalhes sobre a tarefa..." style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);resize:vertical;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'"></textarea>
        </div><!-- DATA E HORA -->
        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div>
-         <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Data *</label> <input type="date" id="f-date" required style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
+        <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Data *</label> <input type="date" id="f-date" required style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
         </div>
-        <div>
-         <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Horário</label> <input type="time" id="f-time" style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
+        <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Horário</label> <input type="time" id="f-time" style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'">
         </div>
        </div><!-- PRIORIDADE -->
-       <div>
-        <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:block;letter-spacing:.4px">Nível de Prioridade</label>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="priority-buttons">
-         <button type="button" onclick="setPriority('low')" class="priority-btn" data-priority="low" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 12px;border:2px solid #E2E8F0;border-radius:12px;background:transparent;cursor:pointer;transition:all .2s;font-weight:600;font-size:13px;color:var(--text)">
+       <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:block;letter-spacing:.4px">Nível de Prioridade</label>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px" id="priority-buttons"><button type="button" onclick="setPriority('low')" class="priority-btn" data-priority="low" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 12px;border:2px solid #E2E8F0;border-radius:12px;background:transparent;cursor:pointer;transition:all .2s;font-weight:600;font-size:13px;color:var(--text)">
           <div style="width:14px;height:14px;border-radius:50%;background:var(--low)"></div><span>Baixa</span> </button> <button type="button" onclick="setPriority('medium')" class="priority-btn" data-priority="medium" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 12px;border:2px solid #E2E8F0;border-radius:12px;background:transparent;cursor:pointer;transition:all .2s;font-weight:600;font-size:13px;color:var(--text)">
           <div style="width:14px;height:14px;background:var(--medium);clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)"></div><span>Média</span> </button> <button type="button" onclick="setPriority('high')" class="priority-btn" data-priority="high" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 12px;border:2px solid #E2E8F0;border-radius:12px;background:transparent;cursor:pointer;transition:all .2s;font-weight:600;font-size:13px;color:var(--text)">
           <div style="width:14px;height:14px;background:var(--high)"></div><span>Alta</span> </button> <button type="button" onclick="setPriority('urgent')" class="priority-btn" data-priority="urgent" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 12px;border:2px solid #E2E8F0;border-radius:12px;background:transparent;cursor:pointer;transition:all .2s;font-weight:600;font-size:13px;color:var(--text)">
           <div style="width:14px;height:14px;border-radius:50%;background:var(--urgent)"></div><span>Urgente</span> </button>
         </div><input type="hidden" id="f-priority" value="low">
        </div><!-- OBSERVAÇÕES -->
-       <div>
-        <label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Observações</label> <textarea id="f-notes" rows="2" placeholder="Notas adicionais para lembrar..." style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);resize:vertical;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'"></textarea>
+       <div><label style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;display:block;letter-spacing:.4px">Observações</label> <textarea id="f-notes" rows="2" placeholder="Notas adicionais para lembrar..." style="border:1.5px solid #E2E8F0;border-radius:14px;padding:14px 16px;font-family:inherit;font-size:14px;width:100%;background:var(--bg);color:var(--text);resize:vertical;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#E2E8F0'"></textarea>
        </div><!-- BOTÕES -->
-       <div id="form-actions" style="display:flex;gap:12px;justify-content:flex-end;padding-top:8px">
-        <button type="button" onclick="closeTaskModal()" class="btn btn-ghost" style="border-radius:12px;padding:12px 24px;font-weight:600;border:1.5px solid #E2E8F0">Cancelar</button> <button type="submit" class="btn btn-primary" id="save-btn" style="border-radius:12px;padding:12px 28px;font-weight:700"><i data-lucide="check" style="width:16px;height:16px"></i> Salvar Tarefa</button>
+       <div id="form-actions" style="display:flex;gap:12px;justify-content:flex-end;padding-top:8px"><button type="button" onclick="closeTaskModal()" class="btn btn-ghost" style="border-radius:12px;padding:12px 24px;font-weight:600;border:1.5px solid #E2E8F0">Cancelar</button> <button type="submit" class="btn btn-primary" id="save-btn" style="border-radius:12px;padding:12px 28px;font-weight:700"><i data-lucide="check" style="width:16px;height:16px"></i> Salvar Tarefa</button>
        </div>
       </div>
      </form>
@@ -348,9 +355,66 @@ function showToast(msg, type='success') {
   const t = document.createElement('div');
   t.className = 'toast';
   t.innerHTML = `<i data-lucide="${icons[type]}" style="width:18px;height:18px;color:${colors[type]}"></i><span>${msg}</span>`;
+  t.style.cursor = 'grab';
+  t.style.touchAction = 'none';
   c.appendChild(t);
   lucide.createIcons();
-  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100px)'; t.style.transition='all .3s'; setTimeout(() => t.remove(), 300); }, 3000);
+  
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+  let startTime = 0;
+  
+  function startDrag(clientX) {
+    isDragging = true;
+    startX = clientX;
+    startTime = Date.now();
+    t.style.cursor = 'grabbing';
+    t.style.transition = 'none';
+  }
+  
+  function moveDrag(clientX) {
+    if (!isDragging || !t.parentElement) return;
+    currentX = clientX - startX;
+    t.style.transform = `translateX(calc(100px + ${currentX}px))`;
+    t.style.opacity = Math.max(0, 1 - Math.abs(currentX) / 100);
+  }
+  
+  function endDrag() {
+    if (!isDragging) return;
+    isDragging = false;
+    t.style.cursor = 'grab';
+    
+    if (Math.abs(currentX) > 60) {
+      t.style.transition = 'all .3s';
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(150px)';
+      setTimeout(() => t.remove(), 300);
+    } else {
+      t.style.transition = 'all .3s';
+      t.style.transform = 'translateX(100px)';
+      t.style.opacity = '1';
+    }
+  }
+  
+  // Mouse events
+  t.addEventListener('mousedown', (e) => startDrag(e.clientX));
+  document.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+  document.addEventListener('mouseup', endDrag);
+  
+  // Touch events
+  t.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), { passive: false });
+  document.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX), { passive: false });
+  document.addEventListener('touchend', endDrag);
+  
+  setTimeout(() => {
+    if (t.parentElement) {
+      t.style.transition = 'all .3s';
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(100px)';
+      setTimeout(() => t.remove(), 300);
+    }
+  }, 3000);
 }
 
 // ===== SETTINGS =====
@@ -435,19 +499,87 @@ function renderNotifications() {
       'urgent': '#EF4444'
     };
 
-    return `<div class="card fade-in" style="padding:12px;border-left:3px solid ${colors[n.type] || '#2563EB'};background:var(--surface)">
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <div style="width:36px;height:36px;border-radius:10px;background:${colors[n.type]}15;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i data-lucide="${icons[n.type] || 'info'}" style="width:18px;height:18px;color:${colors[n.type] || '#2563EB'}"></i>
-        </div>
-        <div style="flex:1;min-width:0">
-          <p style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word">${n.message}</p>
-          <p style="font-size:11px;color:var(--secondary);margin-top:4px">${timeStr}</p>
-        </div>
+    return `<div class="notification-card fade-in" data-notification-id="${n.id}" style="padding:12px;border-left:3px solid ${colors[n.type] || '#2563EB'};background:var(--surface);border-radius:12px;display:flex;gap:10px;align-items:flex-start;cursor:grab;user-select:none;transition:all .2s;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;right:0;bottom:0;width:60px;background:linear-gradient(90deg,transparent 0%,#EF4444 100%);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s">
+        <i data-lucide="trash-2" style="width:16px;height:16px;color:#fff"></i>
+      </div>
+      <div style="width:36px;height:36px;border-radius:10px;background:${colors[n.type]}15;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i data-lucide="${icons[n.type] || 'info'}" style="width:18px;height:18px;color:${colors[n.type] || '#2563EB'}"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word">${n.message}</p>
+        <p style="font-size:11px;color:var(--secondary);margin-top:4px">${timeStr}</p>
       </div>
     </div>`;
   }).join('');
   lucide.createIcons();
+  attachNotificationDragListeners();
+}
+
+function attachNotificationDragListeners() {
+  const cards = document.querySelectorAll('.notification-card');
+  
+  cards.forEach(card => {
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    const notifId = card.dataset.notificationId;
+    
+    function startDrag(clientX) {
+      isDragging = true;
+      startX = clientX;
+      card.style.cursor = 'grabbing';
+      card.style.transition = 'none';
+    }
+    
+    function moveDrag(clientX) {
+      if (!isDragging || !card.parentElement) return;
+      currentX = clientX - startX;
+      card.style.transform = `translateX(${currentX}px)`;
+      card.style.opacity = Math.max(0.3, 1 - Math.abs(currentX) / 150);
+      
+      const deleteIcon = card.querySelector('[data-lucide="trash-2"]').parentElement;
+      deleteIcon.style.opacity = Math.min(1, Math.abs(currentX) / 80);
+    }
+    
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      card.style.cursor = 'grab';
+      
+      if (Math.abs(currentX) > 80) {
+        card.style.transition = 'all .3s';
+        card.style.opacity = '0';
+        card.style.transform = `translateX(${currentX > 0 ? 300 : -300}px)`;
+        setTimeout(() => {
+          notifications = notifications.filter(n => n.id !== notifId);
+          save();
+          renderNotifications();
+          showToast('Notificação removida');
+        }, 300);
+      } else {
+        card.style.transition = 'all .3s';
+        card.style.transform = 'translateX(0)';
+        card.style.opacity = '1';
+      }
+    }
+    
+    // Mouse events
+    card.addEventListener('mousedown', (e) => startDrag(e.clientX));
+    document.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+    document.addEventListener('mouseup', endDrag);
+    
+    // Touch events
+    card.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), { passive: false });
+    document.addEventListener('touchmove', (e) => moveDrag(e.touches[0].clientX), { passive: false });
+    document.addEventListener('touchend', endDrag);
+    
+    // Prevent scrolling while dragging
+    card.addEventListener('touchstart', (e) => {
+      if (e.target.closest('[data-lucide]')) return;
+      e.preventDefault();
+    }, { passive: false });
+  });
 }
 
 function clearAllNotifications() {
@@ -974,16 +1106,30 @@ function renderDashboard() {
     return taskDate < now;
   }).length;
   
+  const pendingCount = tasks.filter(t => t.status !== 'done').length;
+  const completedCount = tasks.filter(t => t.status === 'done').length;
+  const urgentCount = tasks.filter(t => t.priority === 'urgent').length;
+  
   categoryCards.innerHTML = `
-    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#DBEAFE 0%,#BAE6FD 100%);border-left:4px solid var(--primary);cursor:pointer;transition:all .2s" onclick="goToDashboardFilter('today')">
+    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#DBEAFE 0%,#BAE6FD 100%);border-left:4px solid var(--primary);cursor:pointer;transition:all .2s;opacity:.9;hover:opacity:1" onclick="goToDashboardFilter('today')">
       <p style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px;text-transform:uppercase">Hoje</p>
       <h3 style="font-size:24px;font-weight:800;color:var(--primary)">${tasks.filter(t => t.date === todayStr()).length}</h3>
       <p style="font-size:10px;color:var(--primary);opacity:.8">agendadas</p>
     </div>
-    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%);border-left:4px solid var(--urgent);cursor:pointer;transition:all .2s" onclick="goToDashboardFilter('overdue')">
+    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%);border-left:4px solid var(--urgent);cursor:pointer;transition:all .2s;opacity:.9;hover:opacity:1" onclick="goToDashboardFilter('overdue')">
       <p style="font-size:11px;font-weight:700;color:var(--urgent);margin-bottom:4px;text-transform:uppercase">Atrasadas</p>
       <h3 style="font-size:24px;font-weight:800;color:var(--urgent)">${overdueCount}</h3>
       <p style="font-size:10px;color:var(--urgent);opacity:.8">requer ação</p>
+    </div>
+    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);border-left:4px solid var(--medium);cursor:pointer;transition:all .2s;opacity:.9;hover:opacity:1" onclick="goToDashboardFilter('pending')">
+      <p style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:4px;text-transform:uppercase">Pendentes</p>
+      <h3 style="font-size:24px;font-weight:800;color:#B45309">${pendingCount}</h3>
+      <p style="font-size:10px;color:#B45309;opacity:.8">aguardando</p>
+    </div>
+    <div class="card fade-in" style="padding:14px;background:linear-gradient(135deg,#FED7AA 0%,#FDBA74 100%);border-left:4px solid var(--high);cursor:pointer;transition:all .2s;opacity:.9;hover:opacity:1" onclick="goToDashboardFilter('urgent')">
+      <p style="font-size:11px;font-weight:700;color:#EA580C;margin-bottom:4px;text-transform:uppercase">Urgentes</p>
+      <h3 style="font-size:24px;font-weight:800;color:#EA580C">${urgentCount}</h3>
+      <p style="font-size:10px;color:#EA580C;opacity:.8">prioridade urgente</p>
     </div>
   `;
 
@@ -1040,6 +1186,48 @@ function goToDashboardFilter(filterType) {
 
     renderTasks(overdueFilteredTasks, document.getElementById('tasks-list'));
     document.getElementById('tasks-date-label').textContent = 'Tarefas Atrasadas';
+    return;
+  }
+
+  if (filterType === 'pending') {
+    currentFilter = 'pending';
+    selectedTaskDate = null;
+    
+    document.querySelectorAll('[data-filter]').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === 'pending');
+    });
+
+    const pendingFilteredTasks = tasks.filter(t => t.status !== 'done');
+    renderTasks(pendingFilteredTasks, document.getElementById('tasks-list'));
+    document.getElementById('tasks-date-label').textContent = 'Tarefas Pendentes';
+    return;
+  }
+
+  if (filterType === 'completed') {
+    currentFilter = 'done';
+    selectedTaskDate = null;
+    
+    document.querySelectorAll('[data-filter]').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === 'done');
+    });
+
+    const completedFilteredTasks = tasks.filter(t => t.status === 'done');
+    renderTasks(completedFilteredTasks, document.getElementById('tasks-list'));
+    document.getElementById('tasks-date-label').textContent = 'Tarefas Concluídas';
+    return;
+  }
+
+  if (filterType === 'urgent') {
+    currentFilter = 'urgent';
+    selectedTaskDate = null;
+    
+    document.querySelectorAll('[data-filter]').forEach(b => {
+      b.classList.remove('active');
+    });
+
+    const urgentFilteredTasks = tasks.filter(t => t.priority === 'urgent');
+    renderTasks(urgentFilteredTasks, document.getElementById('tasks-list'));
+    document.getElementById('tasks-date-label').textContent = 'Tarefas Urgentes';
     return;
   }
 }
@@ -1110,12 +1298,15 @@ function submitForm() {
     const idx = tasks.findIndex(t => t.id === editingId);
     if (idx > -1) {
       tasks[idx] = { ...tasks[idx], ...data };
-      addNotification('update', `Tarefa "${titleVal}" foi atualizada`);
+      addNotification('update', `✏️ Tarefa "${titleVal}" foi atualizada`);
+      // Limpar a notificação de atraso quando edita, assim se entrar em atraso de novo vai notificar
+      clearTaskNotification(editingId);
     }
   } else {
     const newTask = { id: 'task_' + Date.now(), ...data, status: 'pending', createdAt: new Date().toISOString() };
     tasks.push(newTask);
-    addNotification('create', `Nova tarefa "${titleVal}" criada`);
+    addNotification('create', `✨ Nova tarefa "${titleVal}" criada`);
+    showToast(`✨ Tarefa "${titleVal}" criada com sucesso!`);
   }
 
   save();
@@ -1219,5 +1410,5 @@ function initApp() {
 
 initApp();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5b4638222e8307',t:'MTc3NTA4NTEwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5b9223f7ed830c',t:'MTc3NTA4ODIxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
