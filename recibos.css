@@ -2661,7 +2661,7 @@
       .floating-actions {
         left: 15px;
         right: auto;
-        bottom: 86px;
+        bottom: 112px;
         gap: 8px;
         flex-direction: column;
         align-items: flex-start;
