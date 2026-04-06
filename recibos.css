@@ -1,4 +1,4 @@
-﻿    body {
+    body {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -2596,6 +2596,55 @@
     }
 
     @media (max-width: 768px) {
+      .gb-header {
+        height: 60px;
+      }
+
+      .gb-header-inner {
+        padding: 0 10px;
+        gap: 8px;
+      }
+
+      .gb-brand {
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .gb-brand img {
+        height: 34px;
+      }
+
+      .gb-brand-copy h1 {
+        font-size: 12px;
+        max-width: 110px;
+      }
+
+      .gb-actions {
+        gap: 6px;
+      }
+
+      .btn-sair,
+      .btn-voltar,
+      .mobile-search-toggle {
+        width: 40px;
+        height: 40px;
+        min-height: 40px;
+        padding: 0;
+        border-radius: 12px;
+      }
+
+      .btn-sair span,
+      .btn-voltar span {
+        display: none;
+      }
+
+      .btn-sair svg,
+      .btn-voltar svg {
+        width: 18px;
+        height: 18px;
+      }
+
       .botoes {
         padding: 12px 10px;
       }
@@ -2628,6 +2677,11 @@
       .floating-actions .btn::after,
       .floating-actions a.btn-icon::after {
         display: none;
+      }
+
+      .floating-actions .whatsapp-btn,
+      .botoes .zoom-btn {
+        display: none !important;
       }
 
       .botoes.footer-collapsed + .floating-actions {
