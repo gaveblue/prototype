@@ -1,0 +1,3007 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Portaria Nortefrut - Versão Gestor</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+    <style>
+        body{ font-family:'Segoe UI', Arial, sans-serif; background:#eef2f7; padding:20px; color: #333; }
+        h2{ text-align:center; font-weight:600; letter-spacing:1px; color: #1565c0; }
+        .menu{ display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom: 20px; }
+        .menu button{ padding:14px 22px; border-radius:14px; border:none; background:linear-gradient(135deg,#1e88e5,#1565c0); color:white; font-size:15px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.15); transition:.2s; }
+        .menu button:hover{ transform:scale(1.05); }
+        .section{ display:none; background:white; padding:20px; border-radius:18px; box-shadow:0 8px 25px rgba(0,0,0,.12); max-width: 550px; margin: 0 auto; }
+        input, select { width:100%; padding:12px; border-radius:12px; border:1px solid #ccc; margin:8px 0; font-size:15px; box-sizing: border-box; }
+
+textarea { 
+    width: 100%; 
+    padding: 12px; 
+    border-radius: 12px; 
+    border: 1px solid #ccc; 
+    margin: 8px 0; 
+    font-size: 15px; 
+    box-sizing: border-box; 
+    resize: none;    /* ISSO TRAVA O TAMANHO */
+    height: 80px;   /* DEFINE A ALTURA FIXA */
+}
+        
+        .botao{ background:linear-gradient(135deg,#43a047,#2e7d32); color:white; border:none; padding:14px; width:100%; margin-top:12px; border-radius:14px; font-size:16px; cursor:pointer; font-weight: bold; }
+        .botao.relatorio { background: linear-gradient(135deg,#607d8b,#455a64); }
+        .botao.devolver { background: linear-gradient(135deg,#e53935,#b71c1c); margin-top: 5px; padding: 8px; font-size: 14px; }
+        
+        /* Submenus */
+        .acoes-flex { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .btn-submenu { padding: 15px; border-radius: 12px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .form-oculto { display: none; background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 15px; margin-top: 10px; }
+
+        /* Estilos Frota */
+        .lista-veiculos{ display:flex; flex-direction:column; gap:14px; }
+        .veiculo{ background:white; border-radius:18px; padding:14px; display:flex; align-items:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.12); transition:.2s; border: 2px solid transparent; }
+        .veiculo:hover{ transform:translateY(-3px); border-color: #1e88e5; }
+        .icone{ width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#1e88e5,#1565c0); display:flex; align-items:center; justify-content:center; font-size:30px; color:white; margin-right:14px; overflow: hidden; }
+        .icone img{ width:100%; height:100%; object-fit:cover; }
+        .status-badge { margin-left: auto; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .status-rua { background: #ffebee; color: #c62828; }
+        
+        /* Tabelas e Cards */
+        table{ width:100%; border-collapse:collapse; margin-top:15px; font-size: 14px; }
+        th,td{ padding:8px; border-bottom:1px solid #ddd; text-align:center; }
+        .card-chave {border-left: 4px solid #0288d1; padding: 8px 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 13px; line-height: 1.3;}
+        .card-agenda { border-left: 5px solid #fb8c00; padding: 12px; margin-bottom: 10px; background: #fff8f0; border-radius: 8px; position: relative; }
+        .btn-cancelar { background: #ff5252; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-top: 5px; }
+       
+        .fuel-name{
+        font-weight: 700;
+        font-size: 14px;
+        color: #37474f;
+        margin-bottom: 6px;
+}
+
+        .fuel-qty{
+        font-weight: 800;
+        font-size: 20px;
+        color: #1565c0; /* azul */
+        line-height: 1.1;
+}
+
+        .fuel-qty .unit{
+        font-size: 14px;
+        font-weight: 700;
+        opacity: 0.9;
+}
+
+        /* Estilo do Toast (Pop-up) */
+#toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #43a047; /* Verde igual ao seu botão */
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    padding: 16px;
+    position: fixed;
+    z-index: 9999;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Animação para aparecer e sumir */
+#toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+   /* Cabeçalho bonito */
+.topo{
+  display:flex;
+  justify-content:center;
+  margin-bottom: 14px;
+}
+
+.topo-card{
+  width: min(820px, 96%);
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 18px;
+  padding: 32px 32px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+
+  display:flex;
+  align-items:center;
+  justify-content: center;
+
+  position: relative; /* IMPORTANTE */
+}
+
+/* logo continua normal */
+.logo-box{
+  position: absolute;
+  left: 20px;   /* fixa a logo à esquerda */
+}
+
+.logo-nf{
+  width: 200px;
+  height: auto;
+}
+
+/* agora o texto fica central REAL */
+.topo-textos{
+  text-align: center;
+}
+
+.topo-textos h2{
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #1565c0;
+  font-size: 29px;
+}
+
+.topo-sub{
+  margin-top: 6px;
+  font-size: 14px;
+  color: #607d8b;
+  font-weight: 600;
+}
+
+@media (max-width: 520px){
+  .topo-card{
+    flex-direction: column;
+    text-align: center;
+  }
+  .topo-textos{
+    text-align: center;
+  }
+  .logo-nf{
+    width: 92px;
+    height: 92px;
+  }
+}
+
+.btn-outline-primary{
+  background: #ffffff !important;
+  color: #1565c0 !important;
+  border: 2px solid #1565c0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+.autocomplete-box {
+  position: relative;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.autocomplete-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 9999;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+  display: none;
+}
+
+.autocomplete-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: #f1f5f9;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <div id="toast">Registro realizado com sucesso! ✅</div>
+
+    <header class="topo">
+  <div class="topo-card">
+    <div class="logo-box">
+      <img class="logo-nf" src="imagens/logo-nortefrut.png" alt="Nortefrut">
+    </div>
+
+    <div class="topo-textos">
+      <h2>PORTARIA NORTEFRUT</h2>
+      <div class="topo-sub">Sistema de Controle • Versão Gestor</div>
+    </div>
+  </div>
+</header>
+
+    <div class="menu">
+        <button onclick="abrir('veiculosGeral')">🚗 Veículos</button>
+        <button onclick="abrir('chaves')">🔑 Chaves</button>
+        <button onclick="abrir('empilhadeiras')">🚜 Empilhadeiras</button>
+        <button onclick="abrir('jogos')" style="background: #7b1fa2;">🎮 Jogos</button>
+        <button onclick="abrir('guardachuvas')">☂️ Guarda-Chuva</button>
+        <button onclick="abrir('relatorios')" style="background: #607d8b;">📊 Relatórios</button>
+    </div>
+
+    <div id="veiculosGeral" class="section">
+        <h3 style="text-align: center;">🚗 Gestão de Veículos</h3>
+        <div id="containerBotoesVeiculos" class="acoes-flex">
+
+        <button class="btn-submenu" style="background: linear-gradient(135deg,#1e88e5,#1565c0);"
+      onclick="exibirSubVeiculos('listaVeiculosContent')">📋 CONTROLE DE SAÍDA / RETORNO</button>
+
+        <button class="btn-submenu btn-outline-primary"
+      onclick="exibirSubVeiculos('agendamentoVeiculosContent')">📅 AGENDAMENTO DE VIAGENS</button>
+        </div>
+
+        <div id="listaVeiculosContent" class="form-oculto">
+            <h4>Selecione o veículo:</h4>
+            <div class="lista-veiculos" id="renderListaVeiculos"></div>
+        <button class="botao" style="background:#607d8b; margin-top:20px;"
+      onclick="fecharSubVeiculos()"> ⬅ Voltar</button>
+        </div>
+        
+        <div id="agendamentoVeiculosContent" class="form-oculto">
+        <button class="botao btn-outline-primary" onclick="abrirFormAgendamento()">➕ Agendar Veículo</button>
+
+  <div id="formAgendamentoBox"
+       style="display:none; border:1px solid #ddd; padding:15px; border-radius:12px; margin-top:15px;">
+
+    <h4>📅 Agendar Veículo</h4>
+
+    <select id="ag_veiculo">
+      <option value="">Selecione o Veículo...</option>
+      <option value="Fiat Strada Prata (MPI-4647)">Fiat Strada Prata (MPI-4647)</option>
+      <option value="Fiat Strada Branca (PPX-2827)">Fiat Strada Branca (PPX-2827)</option>
+      <option value="Fiat Strada Branca (QRJ-1A02)">Fiat Strada Branca (QRJ-1A02)</option>
+      <option value="Fiat Mobi (PPY-5A18)">Fiat Mobi (PPY-5A18)</option>
+      <option value="Fiat Mobi (TCA-5G32)">Fiat Mobi (TCA-5G32)</option>
+      <option value="Renault Oroch (SGD-5G26)">Renault Oroch (SGD-5G26)</option>
+      <option value="Caminhonete L200 (MSV-3A51)">Caminhonete L200 (MSV-3A51)</option>
+    </select>
+
+      <input type="date" id="ag_data">
+      <input type="time" id="ag_hora">
+      <input id="ag_local" placeholder="Local/Destino">
+      <input id="ag_quem" placeholder="Nome do Condutor">
+
+      <button class="botao" onclick="salvarAgendamento()"> ➕ Confirmar Agendamento </button>
+
+      <button class="botao" style="background:#607d8b; margin-top:5px;"
+    onclick="fecharFormAgendamento()">⬅ Cancelar </button>
+   </div>
+
+  <h5 style="margin-top:20px;">Reservas Ativas:</h5>
+  <div id="listaAgendamentos"></div>
+
+      <button class="botao"style="background:#607d8b; margin-top:20px;"
+    onclick="fecharSubVeiculos()">⬅ Voltar</button>
+
+    </div>
+</div>
+
+    <div id="veiculosForm" class="section">
+        <h3 id="tituloForm">Movimentação</h3>
+        <input id="v_placa" placeholder="Placa" readonly style="background: #f0f0f0; font-weight: bold;">
+        
+        <div id="campos_saida">
+            <h4>Registro de Saída</h4>
+            <input id="v_km_saida" type="number" placeholder="KM Saída">
+            <div class="autocomplete-box">
+            <input id="v_condutor" type="text" placeholder="Pesquisar Condutor..." autocomplete="off">
+            <div id="lista_condutores" class="autocomplete-list"></div>
+            </div>
+            <input id="v_destino" placeholder="Destino">
+            <div class="autocomplete-box">
+            <input id="v_porteiro_saida" type="text" placeholder="Pesquisar Porteiro..." autocomplete="off">
+            <div id="lista_porteiros_saida" class="autocomplete-list"></div>
+            </div>
+        </div>
+
+        <div id="campos_retorno" style="display:none;">
+            <h4>Registro de Retorno</h4>
+            <p id="info_saida" style="font-size: 13px; color: #666; background: #eee; padding: 10px; border-radius: 8px;"></p>
+            <input id="v_km_retorno" type="number" placeholder="KM Retorno">
+            <div class="autocomplete-box">
+            <input id="v_porteiro_retorno" type="text" placeholder="Pesquisar Porteiro..." autocomplete="off">
+            <div id="lista_porteiros_retorno" class="autocomplete-list"></div>
+            </div>
+            
+            <h4>Checklist</h4>
+            <table>
+                <tr><th>Item</th><th>C</th><th>NC</th></tr>
+                <tr><td>Buzina/Farol/Luzes</td><td><input type="radio" name="c_luz" value="C"></td><td><input type="radio" name="c_luz" value="NC"></td></tr>
+                <tr><td>Pneus/Lataria/Retrovisores</td><td><input type="radio" name="c_pneu" value="C"></td><td><input type="radio" name="c_pneu" value="NC"></td></tr>
+                <tr><td>Limpeza/Ar Condic.</td><td><input type="radio" name="c_limp" value="C"></td><td><input type="radio" name="c_limp" value="NC"></td></tr>
+            </table>
+            <textarea id="v_obs" placeholder="Observações importantes"></textarea>
+        </div>
+        <button class="botao" onclick="processarVeiculo()">Gravar Registro</button>
+        <button class="botao" style="background:#607d8b;" onclick="voltarVeiculos()">⬅ Voltar</button>
+            
+    </div>
+
+    <div id="chaves" class="section">
+        <h3>🔑 Controle de Chaves</h3>
+        <button class="botao" onclick="abrirFormChave()">➕ Registrar Retirada</button>
+        
+        <div id="formChave" style="display:none; border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 12px; background: #f9f9f9;">
+            <div class="autocomplete-box">
+  <input id="ch_sala" type="text" placeholder="Pesquisar Sala/Setor..." autocomplete="off">
+  <div id="lista_chaves_setor" class="autocomplete-list"></div>
+</div>
+
+<input id="ch_num" placeholder="Número da Chave" readonly style="background:#f0f0f0; font-weight:bold;">
+            <input id="ch_quem" placeholder="Quem retirou">
+            <div class="autocomplete-box">
+  <input id="ch_porteiro" type="text" placeholder="Pesquisar Porteiro..." autocomplete="off">
+  <div id="lista_porteiros_chaves" class="autocomplete-list"></div>
+</div>
+            <button class="botao" onclick="salvarChave()">Salvar Retirada</button>
+            <button class="botao" style="background:#999; margin-top:5px;" onclick="cancelarFormChave()">Cancelar</button>
+        </div>
+
+        <h4 style="margin-top:20px;">Chaves em Uso:</h4>
+        <div id="chavesAtivas"></div>
+    </div>
+
+     <div id="guardachuvas" class="section">
+  <h3>☂️ Controle de Guarda-Chuva</h3>
+
+  <button class="botao"style="background:#546e7a;" onclick="document.getElementById('formGuarda').style.display='block'"> ➕ Registrar Retirada</button>
+
+  <!-- FORM -->
+  <div id="formGuarda"
+       style="display:none; border:1px solid #ddd; padding:15px; margin-top:10px; border-radius:12px; background:#f9f9f9;">
+
+    <input id="gu_num" placeholder="Número / Patrimônio">
+    <input id="gu_quem" placeholder="Quem retirou">
+    <input id="gu_setor" placeholder="Setor">
+    <input id="gu_porteiro" placeholder="Entregue por (Porteiro)">
+
+    <button class="botao" style="background:#546e7a;" onclick="salvarGuarda()">Salvar Retirada</button>
+    <button class="botao" style="background:#999; margin-top:5px;" onclick="document.getElementById('formGuarda').style.display='none'">Cancelar</button>
+  </div>
+
+  <h4 style="margin-top:20px;">Guarda-Chuvas em Uso:</h4>
+  <div id="guardasAtivos"></div>
+</div>
+
+<div id="jogos" class="section">
+        <h3>🎮 Controle de Jogos</h3>
+        <button class="botao" style="background: #7b1fa2;" onclick="document.getElementById('formJogoContainer').style.display='block'">➕ Retirar Jogo</button>
+        
+        <div id="formJogoContainer" style="display:none; border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 12px; background: #f9f9f9;">
+            <form id="formJogoReal" autocomplete="off">
+                <input id="jo_func" placeholder="Funcionário">
+                <input id="jo_aut" placeholder="Autorizador">
+                <input id="jo_jogo" placeholder="Jogo (Ex: Sinuca, Ping Pong)">
+                <button type="button" class="botao" style="background: #7b1fa2;" onclick="salvarJogo()">Salvar Retirada</button>
+                <button type="button" class="botao" style="background:#999; margin-top:5px;" onclick="document.getElementById('formJogoContainer').style.display='none'">Cancelar</button>
+            </form>
+        </div>
+
+        <h4 style="margin-top:20px;">Jogos em Uso:</h4>
+        <div id="jogosAtivos"></div>
+    </div>
+
+    <div id="empilhadeiras" class="section">
+        <h3>🚜 Empilhadeiras</h3>
+        <button onclick="abrir('empilhadeiras')">🚜 Empilhadeiras</button>
+        <div id="formAbast" style="display:none; border: 1px solid #ddd; padding: 15px; border-radius: 12px; margin-top: 15px;">
+            <input id="ab_num" type="number" placeholder="Nº Empilhadeira">
+            <input id="ab_motorista" placeholder="Motorista">
+            <input id="ab_porteiro" placeholder="Porteiro">
+            <button class="botao" onclick="salvarAbastecimento()">Gravar</button>
+        <button class="botao" style="background:#999; margin-top:5px;" onclick="cancelarFormEmpilhadeira()">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="relatorios" class="section">
+    <h3>📊 EXPORTAR RELATÓRIO (Excel)</h3>
+
+    <div id="menuRelatorios">
+        <button class="botao relatorio" onclick="abrir('relatorioFrota')"> Controle Frota</button>
+        <button class="botao relatorio" style="background:#fb8c00;" onclick="abrir('relatorioAgendamentos')">📅 Agendamentos Veículos</button>
+        <button class="botao relatorio" style="background:#455a64;" onclick="abrir('relatorioEmpilhadeiras')">🚜 Empilhadeiras</button>
+        <button class="botao relatorio" style="background:#0288d1;" onclick="abrir('relatorioChaves')">🔑 Chaves</button>
+        <button class="botao relatorio" style="background:#546e7a;" onclick="abrir('relatorioGuarda')">☂️ Guarda-Chuva</button>
+        <button class="botao relatorio" style="background:#7b1fa2;" onclick="abrir('relatorioJogos')">🎮 Jogos</button>
+    </div>
+
+</div>
+
+  <!-- PÁGINA NOVA: RELATÓRIO FROTA -->
+<div id="relatorioFrota" class="section">
+  <h3>📅 Relatório Controle Frota</h3>
+
+  <button class="botao relatorio" onclick="exportarRelatorioVeiculosSemanal(0)">
+    ✅ Baixar Semana Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#455a64;"
+          onclick="exportarRelatorioVeiculosSemanal(-1)">
+    ⏮️ Baixar Semana Passada
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+          onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+
+  <!-- PÁGINA NOVA: RELATÓRIO AGENDAMENTOS -->
+<div id="relatorioAgendamentos" class="section">
+  <h3>📅 Relatório Agendamentos (Mensal)</h3>
+
+  <button class="botao relatorio" style="background:#fb8c00;"
+    onclick="exportarRelatorioAgendamentosMensal(0)">
+    ✅ Baixar Mês Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#e67e22;"
+    onclick="exportarRelatorioAgendamentosMensal(-1)">
+    ⏮️ Baixar Mês Passado
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+    onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+
+  <!-- PÁGINA NOVA: RELATÓRIO EMPILHADEIRAS -->
+   <div id="relatorioEmpilhadeiras" class="section">
+  <h3>🚜 Relatório Empilhadeiras (Mensal)</h3>
+
+  <button class="botao relatorio" style="background:#455a64;"
+    onclick="exportarRelatorioEmpilhadeirasMensal(0)">
+    ✅ Baixar Mês Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#37474f;"
+    onclick="exportarRelatorioEmpilhadeirasMensal(-1)">
+    ⏮️ Baixar Mês Passado
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+    onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+ 
+  <!-- PÁGINA NOVA: RELATÓRIO CHAVES -->
+     <div id="relatorioChaves" class="section">
+  <h3>🔑 Relatório Chaves (Mensal)</h3>
+
+  <button class="botao relatorio" style="background:#0288d1;"
+    onclick="exportarRelatorioChavesMensal(0)">
+    ✅ Baixar Mês Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#0277bd;"
+    onclick="exportarRelatorioChavesMensal(-1)">
+    ⏮️ Baixar Mês Passado
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+    onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+ 
+  <!-- PÁGINA NOVA: RELATÓRIO GUARDA CHUVA -->
+<div id="relatorioGuarda" class="section">
+  <h3>☂️ Relatório Guarda-Chuva (Mensal)</h3>
+
+  <button class="botao relatorio" style="background:#546e7a;"
+    onclick="exportarRelatorioGuardaMensal(0)">
+    ✅ Baixar Mês Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#455a64;"
+    onclick="exportarRelatorioGuardaMensal(-1)">
+    ⏮️ Baixar Mês Passado
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+    onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+
+  <!-- PÁGINA NOVA: RELATÓRIO JOGOS -->
+<div id="relatorioJogos" class="section">
+  <h3>🎮 Relatório Jogos (Mensal)</h3>
+
+  <button class="botao relatorio" style="background:#7b1fa2;"
+    onclick="exportarRelatorioJogosMensal(0)">
+    ✅ Baixar Mês Atual
+  </button>
+
+  <button class="botao relatorio" style="background:#6a1b9a;"
+    onclick="exportarRelatorioJogosMensal(-1)">
+    ⏮️ Baixar Mês Passado
+  </button>
+
+  <button class="botao" style="background:#607d8b; margin-top:12px;"
+    onclick="abrir('relatorios')">
+    ⬅ Voltar
+  </button>
+</div>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://portarianortefrut-default-rtdb.firebaseio.com/", projectId: "portarianortefrut" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+window.addEventListener("DOMContentLoaded", () => {
+  const fields = document.querySelectorAll("input, textarea, select");
+
+  configurarAutocomplete("v_condutor", "lista_condutores", condutoresAutorizados);
+  configurarAutocomplete("v_porteiro_saida", "lista_porteiros_saida", porteirosAutorizados);
+  configurarAutocomplete("v_porteiro_retorno", "lista_porteiros_retorno", porteirosAutorizados);
+
+   configurarAutocompleteChaves();
+   configurarAutocompletePorteiroChaves();
+
+  fields.forEach(el => {
+  el.setAttribute("autocomplete", "off");
+  el.setAttribute("autocorrect", "off");
+  el.setAttribute("autocapitalize", "off");
+  el.setAttribute("spellcheck", "false");
+
+  if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+    if (el.hasAttribute("readonly")) return;
+
+    // não aplicar readonly nos campos de autocomplete
+    if (
+      el.id === "v_condutor" ||
+      el.id === "v_porteiro_saida" ||
+      el.id === "v_porteiro_retorno" ||
+      el.id === "ch_sala" ||
+      el.id === "ch_porteiro"
+    ) {
+      return;
+    }
+
+    el.readOnly = true;
+
+    el.addEventListener(
+      "focus",
+      () => {
+        el.readOnly = false;
+      },
+      { once: true }
+    );
+  }
+});
+
+  // 3) Reforço: desliga autocomplete em todos os forms
+  document.querySelectorAll("form").forEach(f => f.setAttribute("autocomplete", "off"));
+});
+
+function mostrarAviso(mensagem) {
+    const toast = document.getElementById("toast");
+    toast.innerText = mensagem; // Define o texto personalizado
+    toast.className = "show";    // Ativa a animação que você criou no CSS
+    
+    // Faz o pop-up sumir após 3 segundos
+    setTimeout(function(){ 
+        toast.className = toast.className.replace("show", ""); 
+    }, 3000);
+}
+        const veiculosCadastrados = [
+            { placa: 'MPI-4647', nome: 'Fiat Strada Prata', img: 'fiat-strada-prata.png' },
+            { placa: 'PPX-2827', nome: 'Fiat Strada Branca', img: 'fiat-strada-branca.png' },
+            { placa: 'QRJ-1A02', nome: 'Fiat Strada Branca', img: 'fiat-strada-branca.png' },
+            { placa: 'PPY-5A18', nome: 'Fiat Mobi (Osvaldinho)', img: 'fiat-mobi.png' },
+            { placa: 'TCA-5G32', nome: 'Fiat Mobi (Edgar)', img: 'fiat-mobi.png' },
+            { placa: 'SGD-5G26', nome: 'Renault Oroch', img: 'oroch.png' },
+            { placa: 'MSV-3A51', nome: 'Caminhonete L200', img: 'L200.png' }
+        ];
+
+        let modoAtual = "SAIDA";
+
+function abrir(id) {
+  document.querySelectorAll(".section").forEach(s => s.style.display = "none");
+  document.getElementById(id).style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function voltarVeiculos() {
+  limparFormularioVeiculos();
+  abrir('veiculosGeral');
+  exibirSubVeiculos('listaVeiculosContent');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+        // --- LÓGICA SUB-MENUS (VEÍCULOS) ---
+function exibirSubVeiculos(idSub) {
+  document.getElementById('containerBotoesVeiculos').style.display = 'none';
+  document.getElementById('listaVeiculosContent').style.display = 'none';
+  document.getElementById('agendamentoVeiculosContent').style.display = 'none';
+  document.getElementById(idSub).style.display = 'block';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function fecharSubVeiculos() {
+  document.getElementById('listaVeiculosContent').style.display = 'none';
+  document.getElementById('agendamentoVeiculosContent').style.display = 'none';
+  document.getElementById('containerBotoesVeiculos').style.display = 'flex';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+} 
+
+const condutoresAutorizados = [
+  "ALEX MORORO",
+  "AMANDA ATAIDES",
+  "ARTHUR SANTOS",
+  "BALBINO ALVES",
+  "BRAULLER COLARES",
+  "BRENO GUEDES",
+  "CASSIO HENRIQUE",
+  "CRISTIANO",
+  "CRISTINA ELISA",
+  "DIÊGO SAMPAIO",
+  "EDGAR MOREIRA",
+  "EDNEY NERES",
+  "JUSCIMAR ARCANJO",
+  "JOILSON",
+  "KLEDER ALVES",
+  "LARISSA GOMES",
+  "LAYON",
+  "LEANDRO LIMA",
+  "LITTIBARSKI SILVA",
+  "LUAN",
+  "LUANA ARAUJO",
+  "MARCOS ROBERTO",
+  "OSVALDINHO",
+  "OSVALDO ATAIDES",
+  "PAULO HENRIQUE",
+  "ROSIMEIRE GABRESCHT",
+  "SAMUEL CARDOSO",
+  "SILVIA ZAMPROGNO",
+  "VANESSA APARECIDA",
+  "LISBOA"
+];
+
+const porteirosAutorizados = [
+  "EDERVAL",
+  "ELIVELTON",
+  "FELIPE",
+  "JACKSON",
+  "RICARDO"
+];
+
+const chavesCadastradas = [
+{numero:"1", sala:"BAÚ"},
+{numero:"2", sala:"GALPÃO VILA NOVA"},
+{numero:"3", sala:"CASA COLABORADOR"},
+{numero:"4", sala:"PORTÃO BANHEIROS APOIO"},
+{numero:"5", sala:"SALA DE VÍDEO-APOIO"},
+{numero:"6", sala:"ACESSO AOS BANHEIROS-ADM"},
+{numero:"7", sala:"BANHEIRO MASC/APOIO"},
+{numero:"8", sala:"BANHEIRO FEM/APOIO"},
+{numero:"9", sala:"COZINHA E PORTÃO FUNDO"},
+{numero:"10", sala:"PORTÃO PRINCIPAL"},
+{numero:"11", sala:"PORTARIA"},
+{numero:"12", sala:"BANHEIRO PORTARIA"},
+{numero:"13", sala:"LOGÍSTICA E FATURAMENTO"},
+{numero:"14", sala:"SALA DE VÍDEO"},
+{numero:"15", sala:"DEPÓSITO OFICINA/CALIBRA"},
+{numero:"16", sala:"GRUPO GERADOR"},
+{numero:"17", sala:"ACESSO PRÉDIO ADM"},
+{numero:"18", sala:"RECEPÇÃO"},
+{numero:"19", sala:"CORREDOR 01"},
+{numero:"20", sala:"SALA DE REUNIÃO"},
+{numero:"21", sala:"ARQUIVO MORTO"},
+{numero:"22", sala:"CPD"},
+{numero:"23", sala:"MATRIZ"},
+{numero:"24", sala:"GERENCIAMENTO ADM"},
+{numero:"25", sala:"CORREDOR 02"},
+{numero:"26", sala:"MATERIAL DE ESCRITÓRIO"},
+{numero:"27", sala:"COZINHA"},
+{numero:"28", sala:"COZINHA PRÉDIO ADM"},
+{numero:"29", sala:"COMERCIAL"},
+{numero:"30", sala:"ALMOXARIFADO 01"},
+{numero:"31", sala:"LAVOURA"},
+{numero:"32", sala:"GERÊNCIA FINANCEIRA"},
+{numero:"33", sala:"SECRETARIA EXECUTIVA"},
+{numero:"34", sala:"ARQUIVO PESSOAL SÁVIO"},
+{numero:"35", sala:"SALA DE SÁVIO"},
+{numero:"36", sala:"BANHEIRO FEM ADM"},
+{numero:"37", sala:"BANHEIRO MASC ADM"},
+{numero:"38", sala:"ARQ EM FRENTE A RECEPÇÃO"},
+{numero:"39", sala:"ACESSO PRODUÇÃO"},
+{numero:"40", sala:"REFEITÓRIO"},
+{numero:"41", sala:"DML"},
+{numero:"42", sala:"MATERIAIS QUÍMICOS"},
+{numero:"43", sala:"LABORATÓRIO"},
+{numero:"44", sala:"BANHEIRO FEM PRODUÇÃO"},
+{numero:"45", sala:"BANHEIRO MASC PRODUÇÃO"},
+{numero:"46", sala:"BANHEIRO MASCULINO"},
+{numero:"47", sala:"BANHEIRO FEMININO"},
+{numero:"48", sala:"COMPRAS"},
+{numero:"49", sala:"SEGURANÇA DO TRABALHO"},
+{numero:"50", sala:"RH"},
+{numero:"51", sala:"PRODUÇÃO"},
+{numero:"52", sala:"GERENTE DE OPERAÇÕES"},
+{numero:"53", sala:"TANQUE DE ABASTECIMENTO"},
+{numero:"54", sala:"TANQUE DE ABASTECIMENTO 02"},
+{numero:"55", sala:"CATRACA PRODUÇÃO"},
+{numero:"56", sala:"CATRACA PRINCIPAL"},
+{numero:"57", sala:"CATRACA"},
+{numero:"58", sala:"VESTIÁRIO MASCULINO"},
+{numero:"59", sala:"VESTIÁRIO FEMININO"},
+{numero:"60", sala:"BOMBA E REGISTRO 01"},
+{numero:"61", sala:"BOMBA E REGISTRO 02"},
+{numero:"62", sala:"PORTÃO EMBALAGEM"},
+{numero:"63", sala:"DEPÓSITO DE GÁS"},
+{numero:"64", sala:"PORTÃO SUMIDOURO"},
+{numero:"65", sala:"BANHEIRO FEM CITRUS"},
+{numero:"66", sala:"BANHEIRO MASC CITRUS"},
+{numero:"67", sala:"PORTÃO DO ESTACIONAMENTO"},
+{numero:"68", sala:"PITSTOP 01"},
+{numero:"69", sala:"PITSTOP 02"},
+{numero:"70", sala:"ARMÁRIO ESTOQUE"},
+{numero:"71", sala:"PORTÃO DA ENTRADA DO PÁTIO"},
+{numero:"72", sala:"PORTÃO VESTIÁRIO"},
+{numero:"73", sala:"AGROTISA"},
+{numero:"74", sala:"OZÔNIO"},
+{numero:"75", sala:"EMPILHADEIRA"},
+{numero:"76", sala:"PAINEL DA CALIBRA"},
+{numero:"77", sala:"PALETEIRA ELÉTRICA"},
+{numero:"78", sala:"DML PRODUÇÃO"},
+{numero:"79", sala:"GAVETA DE FERRAMENTAS OFIC"},
+{numero:"80", sala:"CHAVE DA BOMBA"},
+{numero:"81", sala:"PORTÃO FOTOVOLTAICA"},
+{numero:"82", sala:"DEPÓSITO MATERIAL CONST"},
+{numero:"83", sala:"ESTAC ENTRADA LATERAL"},
+{numero:"84", sala:"PAINEL DO GERADOR"},
+{numero:"85", sala:"PORTÃO ENTRADA VILA NOVA"},
+{numero:"86", sala:"S10"},
+{numero:"87", sala:"S500"},
+{numero:"88", sala:"ANDERSON MENGUE"},
+{numero:"89", sala:"ALOJAMENTO NORTEFRUT"},
+{numero:"90", sala:"RACK DA PRODUÇÃO"},
+{numero:"91", sala:"LIMPEZA"},
+{numero:"92", sala:"GAVETA DIÁRIAS"},
+{numero:"93", sala:"SALA DE REUNIÃO NOVA"},
+{numero:"94", sala:"FINANCEIRO"},
+{numero:"95", sala:"GERENTE OPERAÇÕES NOVA"},
+{numero:"96", sala:"BANHEIRO SALA SÁVIO"},
+{numero:"97", sala:"CANCELA DO REFÚGIO"}
+];
+
+        // --- VEÍCULOS (FROTA) ---
+        db.ref('status_veiculos').on('value', snap => {
+            const statusOnline = snap.val() || {};
+            let html = "";
+            veiculosCadastrados.forEach(v => {
+                const emUso = statusOnline[v.placa] && statusOnline[v.placa].emUso;
+                html += `<div class="veiculo" onclick="prepararForm('${v.placa}')"><div class="icone"><img src="imagens/${v.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/741/741407.png'"></div><div class="info"><b>${v.nome}</b><br><small>${v.placa}</small></div>${emUso ? '<span class="status-badge status-rua">NA RUA</span>' : ''}</div>`;
+            });
+            document.getElementById('renderListaVeiculos').innerHTML = html;
+        });
+
+        function prepararForm(placa) {  
+            limparFormularioVeiculos();
+            abrir('veiculosForm');
+            document.getElementById('v_placa').value = placa;
+            db.ref('status_veiculos/' + placa).once('value').then(snap => {
+                const d = snap.val();
+                if (d && d.emUso) {
+                    modoAtual = "RETORNO";
+                    document.getElementById('campos_saida').style.display = "none";
+                    document.getElementById('campos_retorno').style.display = "block";
+                    document.getElementById('info_saida').innerText = `Condutor: ${d.condutor} | KM Saída: ${d.kmSaida}`;
+                } else {
+                    modoAtual = "SAIDA";
+                    document.getElementById('campos_saida').style.display = "block";
+                    document.getElementById('campos_retorno').style.display = "none";
+                }
+            });
+        }
+
+        function limparFormularioVeiculos() {
+  document.getElementById('v_km_saida').value = "";
+  document.getElementById('v_condutor').value = "";
+  document.getElementById('v_destino').value = "";
+  document.getElementById('v_porteiro_saida').value = "";
+
+  document.getElementById('v_km_retorno').value = "";
+  document.getElementById('v_porteiro_retorno').value = "";
+  document.getElementById('v_obs').value = "";
+  document.getElementById('info_saida').innerText = "";
+
+  document.getElementById('lista_condutores').innerHTML = "";
+  document.getElementById('lista_condutores').style.display = "none";
+
+  document.getElementById('lista_porteiros_saida').innerHTML = "";
+  document.getElementById('lista_porteiros_saida').style.display = "none";
+
+  document.getElementById('lista_porteiros_retorno').innerHTML = "";
+  document.getElementById('lista_porteiros_retorno').style.display = "none";
+
+  document.querySelectorAll('input[name="c_luz"], input[name="c_pneu"], input[name="c_limp"]').forEach(r => {
+    r.checked = false;
+  });
+}
+        
+       function processarVeiculo() {
+  const placa = document.getElementById('v_placa').value;
+
+  if (modoAtual === "SAIDA") {
+    const kmSaida = document.getElementById('v_km_saida').value;
+    const condutor = document.getElementById('v_condutor').value.trim().toUpperCase();
+    const destino = document.getElementById('v_destino').value.trim();
+    const porteiroSaida = document.getElementById('v_porteiro_saida').value.trim().toUpperCase();
+
+    if (!kmSaida || !condutor || !destino || !porteiroSaida) {
+      mostrarAviso("Preencha KM, condutor, destino e porteiro! ⚠️");
+      return;
+    }
+
+    if (!condutoresAutorizados.includes(condutor)) {
+      mostrarAviso("Selecione um condutor válido na lista! ⚠️");
+      return;
+    }
+
+    if (!porteirosAutorizados.includes(porteiroSaida)) {
+      mostrarAviso("Selecione um porteiro válido na lista! ⚠️");
+      return;
+    }
+
+    const dados = {
+      emUso: true,
+      placa,
+      kmSaida,
+      condutor,
+      destino,
+      porteiroSaida,
+      dataSaida: new Date().toLocaleDateString('pt-BR'),
+      horaSaida: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+    };
+
+    db.ref('status_veiculos/' + placa).set(dados).then(() => {
+      mostrarAviso("Registro Salvo com Sucesso! ✅");
+      limparFormularioVeiculos();
+      abrir('veiculosGeral');
+      exibirSubVeiculos('listaVeiculosContent');
+    });
+
+  } else {
+    db.ref('status_veiculos/' + placa).once('value').then(snap => {
+      const porteiroRetorno = document.getElementById('v_porteiro_retorno').value.trim().toUpperCase();
+
+      if (!porteiroRetorno) {
+        mostrarAviso("Informe o porteiro do retorno! ⚠️");
+        return;
+      }
+
+      if (!porteirosAutorizados.includes(porteiroRetorno)) {
+        mostrarAviso("Selecione um porteiro válido na lista! ⚠️");
+        return;
+      }
+
+      const historico = {
+        ...snap.val(),
+        kmRetorno: document.getElementById('v_km_retorno').value,
+        porteiroRetorno,
+        dataRetorno: new new Date().toLocaleDateString('pt-BR'),
+        horaRetorno: new Date().toLocaleTimeString('pt-BR', { hour12: false }),
+        checklist_luz: document.querySelector('input[name="c_luz"]:checked')?.value || "N/A",
+        checklist_pneu: document.querySelector('input[name="c_pneu"]:checked')?.value || "N/A",
+        checklist_limp: document.querySelector('input[name="c_limp"]:checked')?.value || "N/A",
+        obs: document.getElementById('v_obs').value
+      };
+
+      db.ref('historico_viagens').push(historico)
+        .then(() => db.ref('status_veiculos/' + placa).remove())
+        .then(() => {
+          mostrarAviso("Retorno registrado! ✅");
+          limparFormularioVeiculos();
+          abrir('veiculosGeral');
+          exibirSubVeiculos('listaVeiculosContent');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+  }
+}
+
+        // --- LIMPAR FORM AGENDAMENTO ---
+function limparFormAgendamento() {
+  document.getElementById('ag_veiculo').value = "";
+  document.getElementById('ag_data').value = "";
+  document.getElementById('ag_hora').value = "";
+  document.getElementById('ag_local').value = "";
+  document.getElementById('ag_quem').value = "";
+}
+
+        // --- AGENDAMENTO ---
+        function salvarAgendamento() {
+            const ag = { 
+                veiculo: document.getElementById('ag_veiculo').value, 
+                data: document.getElementById('ag_data').value, 
+                hora: document.getElementById('ag_hora').value, 
+                local: document.getElementById('ag_local').value, 
+                quem: document.getElementById('ag_quem').value
+            };
+            
+            if(!ag.veiculo || !ag.data || !ag.quem) {
+                mostrarAviso("Preencha veículo, data e condutor! ⚠️");
+                return;
+            }
+            
+            db.ref('agendamentos_veiculos').push(ag).then(() => {
+                mostrarAviso("Agendamento realizado! 📅");
+                limparFormAgendamento();
+                 fecharFormAgendamento();
+            });
+        }
+
+        db.ref('agendamentos_veiculos').on('value', snap => {
+            const dados = snap.val();
+            let html = "";
+            if(!dados) {
+                html = "<p style='color:gray; font-size:13px;'>Nenhum veículo agendado.</p>";
+            } else {
+                for (let id in dados) {
+                    const dataBR = dados[id].data.split('-').reverse().join('/');
+                    html += `
+                        <div class="card-agenda">
+                            <b>${dados[id].veiculo}</b><br>
+                            📅 Data: ${dataBR} às ${dados[id].hora}<br>
+                            📍 Local: ${dados[id].local}<br>
+                            👤 Condutor: ${dados[id].quem}<br>
+                            <button class="botao devolver" onclick="finalizarAgendamento('${id}')">Finalizar Agendamento</button>
+                        </div>`;
+                }
+            }
+            document.getElementById('listaAgendamentos').innerHTML = html;
+        });
+
+        function finalizarAgendamento(id) {
+            if(confirm("Deseja finalizar este agendamento e movê-lo para o histórico?")) {
+                db.ref('agendamentos_veiculos/' + id).once('value').then(snap => {
+                    const dados = {
+                        ...snap.val(),
+                        dataFinalizacao: new Date().toLocaleDateString('pt-BR'),
+                        horaFinalizacao: new Date().toLocaleTimeString('pt-BR', { hour12: false }),
+                        status: "Concluído"
+                    };
+                    db.ref('historico_agendamentos').push(dados).then(() => {
+                        db.ref('agendamentos_veiculos/' + id).remove();
+                        mostrarAviso("Agendamento finalizado com sucesso! ✅");
+                    });
+                });
+            }
+        }
+
+        // --- CHAVES ---
+
+        function abrirFormChave() {
+  limparFormChaves();
+  document.getElementById('formChave').style.display = 'block';
+}
+
+        function cancelarFormChave() {
+  limparFormChaves();
+  document.getElementById('formChave').style.display = 'none';
+}
+        function limparFormChaves() {
+  document.getElementById('ch_sala').value = "";
+  document.getElementById('ch_num').value = "";
+  document.getElementById('ch_quem').value = "";
+  document.getElementById('ch_porteiro').value = "";
+
+  const lista = document.getElementById('lista_chaves_setor');
+  if (lista) {
+    lista.innerHTML = "";
+    lista.style.display = "none";
+  }
+}
+
+        function salvarChave() {
+  const sala = document.getElementById('ch_sala').value.trim().toUpperCase();
+  const num = document.getElementById('ch_num').value.trim();
+  const quem = document.getElementById('ch_quem').value.trim();
+  const porteiro = document.getElementById('ch_porteiro').value.trim().toUpperCase();
+
+  if (!sala || !num || !quem || !porteiro) {
+    mostrarAviso("Preencha sala, chave, quem retirou e porteiro! ⚠️");
+    return;
+  }
+
+  const chaveExiste = chavesCadastradas.some(item =>
+    item.sala.toUpperCase() === sala && String(item.numero) === String(num)
+  );
+
+  if (!chaveExiste) {
+    mostrarAviso("Selecione uma sala/setor válida da lista! ⚠️");
+    return;
+  }
+
+  if (!porteirosAutorizados.includes(porteiro)) {
+    mostrarAviso("Selecione um porteiro válido da lista! ⚠️");
+    return;
+  }
+
+  db.ref('chaves_em_uso').once('value').then(snap => {
+    const dados = snap.val() || {};
+
+    const chaveJaEmUso = Object.values(dados).some(item =>
+      String(item.num) === String(num)
+    );
+
+    if (chaveJaEmUso) {
+      mostrarAviso("Essa chave já está em uso! ⚠️");
+      return;
+    }
+
+    const ch = {
+      sala,
+      num,
+      quem,
+      porteiro,
+      dataRetirada: new Date().toLocaleDateString('pt-BR'),
+      horaRetirada: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+    };
+
+    db.ref('chaves_em_uso').push(ch).then(() => {
+      mostrarAviso("Chave Retirada com Sucesso! 🔑");
+      limparFormChaves();
+      document.getElementById('formChave').style.display = 'none';
+    });
+  });
+}
+
+function configurarAutocompletePorteiroChaves() {
+  const input = document.getElementById("ch_porteiro");
+  const lista = document.getElementById("lista_porteiros_chaves");
+
+  if (!input || !lista) return;
+
+  function renderResultados(termo) {
+    lista.innerHTML = "";
+
+    const busca = termo.trim().toUpperCase();
+
+    const resultados = busca
+      ? porteirosAutorizados.filter(nome => nome.includes(busca))
+      : porteirosAutorizados;
+
+    if (resultados.length === 0) {
+      lista.style.display = "none";
+      return;
+    }
+
+    resultados.forEach(nome => {
+      const option = document.createElement("div");
+      option.className = "autocomplete-item";
+      option.textContent = nome;
+
+      option.addEventListener("click", function () {
+        input.value = nome;
+        lista.style.display = "none";
+      });
+
+      lista.appendChild(option);
+    });
+
+    lista.style.display = "block";
+  }
+
+  input.addEventListener("input", function () {
+    renderResultados(this.value);
+  });
+
+  input.addEventListener("focus", function () {
+    renderResultados(this.value);
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!input.contains(e.target) && !lista.contains(e.target)) {
+      lista.style.display = "none";
+    }
+  });
+}
+
+db.ref('chaves_em_uso').on('value', snap => {
+  const dados = snap.val();
+  let html = "";
+
+  if (dados) {
+    for (let id in dados) {
+      html += `
+        <div class="card-chave" style="border-left-color:#0288d1;">
+          <b>🔑 Nº ${dados[id].num} - ${dados[id].sala}</b><br>
+<small>
+👤 ${dados[id].quem} | 🛂 ${dados[id].porteiro}
+</small><br>
+<small>
+📅 ${dados[id].dataRetirada} ${dados[id].horaRetirada}
+</small>
+          <button class="botao devolver" onclick="devolverChave('${id}')">
+            Registrar Devolução
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById('chavesAtivas').innerHTML =
+    html || "<p>Nenhuma chave em uso no momento.</p>";
+});
+
+function devolverChave(id) {
+  db.ref('chaves_em_uso/' + id).once('value').then(snap => {
+    const dadosOriginais = snap.val();
+
+    if (!dadosOriginais) {
+      mostrarAviso("Chave não encontrada! ⚠️");
+      return;
+    }
+
+    const dadosHistorico = {
+      ...dadosOriginais,
+      dataDevolucao: new Date().toLocaleDateString('pt-BR'),
+      horaDevolucao: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+    };
+
+    db.ref('historico_chaves').push(dadosHistorico)
+      .then(() => db.ref('chaves_em_uso/' + id).remove())
+      .then(() => {
+        mostrarAviso("Chave devolvida com sucesso! 🔑");
+      })
+      .catch(error => {
+        console.error("Erro ao devolver chave:", error);
+        mostrarAviso("Erro ao registrar devolução! ⚠️");
+      });
+  });
+}
+
+        // --- FUNÇÕES DO SETOR JOGOS ---
+        function salvarJogo() {
+            const jo = { 
+                funcionario: document.getElementById('jo_func').value, 
+                autorizador: document.getElementById('jo_aut').value, 
+                jogo: document.getElementById('jo_jogo').value, 
+                data: new Date().toLocaleDateString('pt-BR'),
+                hora: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+            };
+            
+            if(!jo.funcionario || !jo.jogo) {
+                mostrarAviso("Preencha o funcionário e o jogo! ⚠️");
+                return;
+            }
+
+            db.ref('jogos_em_uso').push(jo).then(() => { 
+                mostrarAviso("Retirada de jogo salva! 🎮"); 
+                document.getElementById('formJogoReal').reset();
+                document.getElementById('formJogoContainer').style.display='none'; 
+            });
+        }
+
+        db.ref('jogos_em_uso').on('value', snap => {
+            const jogos = snap.val();
+            let html = "";
+            if(jogos) {
+                for (let id in jogos) {
+                    html += `
+                        <div class="card-chave" style="border-left-color: #7b1fa2;">
+                            <b>${jogos[id].jogo}</b><br>
+                            <small>Func.: ${jogos[id].funcionario} | Aut.: ${jogos[id].autorizador}</small><br>
+                            <small>Data: ${jogos[id].data}</small><br>
+                            <button class="botao devolver" onclick="devolverJogo('${id}')">Registrar Devolução</button>
+                        </div>`;
+                }
+            }
+            document.getElementById('jogosAtivos').innerHTML = html || "<p>Nenhum jogo em uso no momento.</p>";
+        });
+
+        function devolverJogo(id) {
+            db.ref('jogos_em_uso/' + id).once('value').then(snap => {
+                const dados = { 
+                    ...snap.val(), 
+                    dataDevolucao: new Date().toLocaleDateString('pt-BR'), 
+                    horaDevolucao: new Date().toLocaleTimeString('pt-BR', { hour12: false }) 
+                };
+                db.ref('historico_jogos').push(dados).then(() => {
+                    db.ref('jogos_em_uso/' + id).remove();
+                    mostrarAviso("Jogo devolvido com sucesso!");
+                });
+            });
+        }
+
+       // --- RELATÓRIOS ---
+async function exportarRelatorioVeiculosSemanal(offsetSemana = 0) {
+  const snap = await db.ref('historico_viagens').once('value');
+  const raw = snap.val() || {};
+
+  const hoje = new Date();
+const day = (hoje.getDay() + 6) % 7;
+
+const inicioSemana = new Date(hoje);
+inicioSemana.setDate(hoje.getDate() - day);
+inicioSemana.setHours(0, 0, 0, 0);
+
+inicioSemana.setDate(inicioSemana.getDate() + (offsetSemana * 7));
+
+  const fimSemana = new Date(inicioSemana);
+  fimSemana.setDate(inicioSemana.getDate() + 6);
+  fimSemana.setHours(23, 59, 59, 999);
+
+  function toDateBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  const lista = Object.values(raw)
+    .filter(i => i.dataSaida && i.dataRetorno)
+    .filter(i => {
+      const p = String(i.dataSaida).split("/");
+      if (p.length !== 3) return false;
+      const data = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+      return data >= inicioSemana && data <= fimSemana;
+    })
+    .map(i => {
+      const kmIni = Number(i.kmSaida);
+      const kmFim = Number(i.kmRetorno);
+      const kmRodado = (Number.isFinite(kmIni) && Number.isFinite(kmFim)) ? (kmFim - kmIni) : null;
+
+      return {
+        dataSaida: i.dataSaida || "",
+        horaSaida: i.horaSaida || "",
+        dataEntrada: i.dataRetorno || "",
+        horaEntrada: i.horaRetorno || "",
+        placa: i.placa || "",
+        kmIni: Number.isFinite(kmIni) ? kmIni : null,
+        kmFim: Number.isFinite(kmFim) ? kmFim : null,
+        kmRodado,
+        condutor: i.condutor || "",
+        destino: i.destino || "",
+        luzes: i.checklist_luz || "",
+        pneus: i.checklist_pneu || "",
+        arlimp: i.checklist_limp || "",
+        obs: i.obs || "",
+        porteiroRetorno: i.porteiroRetorno || ""
+      };
+    });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro finalizado nesta semana. 📅");
+    return;
+  }
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Controle de Veículos", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  const titulo = "RELATÓRIO SEMANAL - SAÍDA E RETORNO (FROTA)";
+  const periodo = `Período: ${toDateBR(inicioSemana)} até ${toDateBR(fimSemana)}`;
+
+  ws.mergeCells("A1:O1");
+  ws.getCell("A1").value = titulo;
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
+
+  ws.mergeCells("A2:O2");
+  ws.getCell("A2").value = periodo;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
+
+  const columns = [
+    { header: "Data Saída", key: "dataSaida", width: 12 },
+    { header: "Hora Saída", key: "horaSaida", width: 10 },
+    { header: "Data Entrada", key: "dataEntrada", width: 12 },
+    { header: "Hora Entrada", key: "horaEntrada", width: 10 },
+    { header: "Placa", key: "placa", width: 10 },
+    { header: "KM Inicial", key: "kmIni", width: 10 },
+    { header: "KM Final", key: "kmFim", width: 10 },
+    { header: "KM Rodado", key: "kmRodado", width: 10 },
+    { header: "Condutor", key: "condutor", width: 20 },
+    { header: "Destino", key: "destino", width: 22 },
+    { header: "Luzes", key: "luzes", width: 10 },
+    { header: "Pneus", key: "pneus", width: 10 },
+    { header: "Ar/Limp", key: "arlimp", width: 10 },
+    { header: "Observações", key: "obs", width: 30 },
+    { header: "RESPONSAVEL", key: "porteiroRetorno", width: 18 }
+  ];
+
+  ws.columns = columns;
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: false };
+  headerRow.height = 22;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1565C0" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, rowNumber) => {
+    if (rowNumber < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    });
+  });
+
+  ["F", "G", "H"].forEach(col => ws.getColumn(col).numFmt = "#,##0");
+
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cell = ws.getCell(`H${r}`);
+    if (typeof cell.value === "number" && cell.value < 0) {
+      cell.font = { color: { argb: "FFD32F2F" }, bold: true };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+const nome = offsetSemana === -1
+    ? "Relatorio_Frota_Semana_Passada.xlsx"
+    : "Relatorio_Frota_Semana_Atual.xlsx";
+
+saveAs(new Blob([buffer]), nome);
+}
+
+
+// ✅ FUNÇÃO DO AGENDAMENTO (FORA DA OUTRA!)
+async function exportarRelatorioAgendamentos() {
+  const snapAtivos = await db.ref('agendamentos_veiculos').once('value');
+  const snapHist = await db.ref('historico_agendamentos').once('value');
+
+  const ativos = Object.values(snapAtivos.val() || {});
+  const historico = Object.values(snapHist.val() || {});
+
+  const lista = [];
+
+  ativos.forEach(a => {
+    lista.push({
+      veiculo: a.veiculo || "",
+      data: a.data || "",
+      hora: a.hora || "",
+      destino: a.local || "",
+      condutor: a.quem || "",
+      status: "AGENDADO",
+      dataFinal: "",
+      horaFinal: ""
+    });
+  });
+
+  historico.forEach(a => {
+    lista.push({
+      veiculo: a.veiculo || "",
+      data: a.data || "",
+      hora: a.hora || "",
+      destino: a.local || "",
+      condutor: a.quem || "",
+      status: "CONCLUÍDO",
+      dataFinal: a.dataFinalizacao || "",
+      horaFinal: a.horaFinalizacao || ""
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum agendamento encontrado 📅");
+    return;
+  }
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet("Agendamentos");
+
+  ws.mergeCells("A1:H1");
+  ws.getCell("A1").value = "RELATÓRIO DE AGENDAMENTOS DE VEÍCULOS";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  ws.columns = [
+    { header: "Veículo", key: "veiculo", width: 30 },
+    { header: "Data", key: "data", width: 12 },
+    { header: "Hora", key: "hora", width: 10 },
+    { header: "Destino", key: "destino", width: 25 },
+    { header: "Condutor", key: "condutor", width: 22 },
+    { header: "Status", key: "status", width: 14 },
+    { header: "Data Finalização", key: "dataFinal", width: 16 },
+    { header: "Hora Finalização", key: "horaFinal", width: 16 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center" };
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1565C0" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center" };
+    });
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Relatorio_Agendamentos.xlsx");
+}
+
+async function exportarRelatorioEmpilhadeiras() {
+  const snap = await db.ref('abastecimentos').once('value');
+  const raw = snap.val() || {};
+
+  // Monta lista e já ordena por data (quando possível)
+  const lista = Object.values(raw).map(i => {
+    // tenta ler data BR dd/mm/aaaa
+    const dataStr = i.data || "";
+    let dataObj = null;
+    const p = String(dataStr).split("/");
+    if (p.length === 3) {
+      dataObj = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+    }
+
+    return {
+      data: dataStr,
+      empilhadeira: i.num ?? "",
+      motorista: i.motorista ?? "",
+      porteiro: i.porteiro ?? "",
+      _dataObj: dataObj
+    };
+  });
+
+  // ordena por data, se tiver data válida
+  lista.sort((a, b) => {
+    if (a._dataObj && b._dataObj) return a._dataObj - b._dataObj;
+    return String(a.data).localeCompare(String(b.data));
+  });
+
+  // remove campo auxiliar
+  lista.forEach(i => delete i._dataObj);
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de empilhadeira encontrado 🚜");
+    return;
+  }
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Empilhadeiras", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  // Título
+  ws.mergeCells("A1:D1");
+  ws.getCell("A1").value = "RELATÓRIO - ABASTECIMENTO DE EMPILHADEIRAS";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
+
+  // Período (só um texto)
+  ws.mergeCells("A2:D2");
+  ws.getCell("A2").value = `Gerado em: ${new Date().toLocaleString()}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
+
+  // Colunas
+  ws.columns = [
+    { header: "Data", key: "data", width: 14 },
+    { header: "Nº Empilhadeira", key: "empilhadeira", width: 16 },
+    { header: "Motorista", key: "motorista", width: 22 },
+    { header: "Porteiro", key: "porteiro", width: 18 }
+  ];
+
+  // Cabeçalho na linha 3
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { vertical: "middle", horizontal: "center", wrapText: false };
+  headerRow.height = 22;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF455A64" } }; // cinza/azul
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  // Dados a partir da linha 4
+  lista.forEach(item => ws.addRow(item));
+
+  // Bordas e alinhamento
+  ws.eachRow((row, rowNumber) => {
+    if (rowNumber < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    });
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Relatorio_Empilhadeiras.xlsx");
+}
+
+        async function exportarRelatorioChavesNovo() {
+
+  const snapHist = await db.ref("historico_chaves").once("value");
+  const snapAtivas = await db.ref("chaves_em_uso").once("value");
+
+  const historico = snapHist.val() || {};
+  const ativas = snapAtivas.val() || {};
+
+  const lista = [];
+
+  // EM USO
+  Object.values(ativas).forEach(c => {
+    lista.push({
+      dataRetirada: c.dataRetirada || "",
+      horaRetirada: c.horaRetirada || "",
+      numero: c.num || "",
+      sala: c.sala || "",
+      retirou: c.quem || "",
+      porteiro: c.porteiro || "",
+      dataDev: "",
+      horaDev: ""
+    });
+  });
+
+  // DEVOLVIDAS
+  Object.values(historico).forEach(c => {
+    lista.push({
+      dataRetirada: c.dataRetirada || "",
+      horaRetirada: c.horaRetirada || "",
+      numero: c.num || "",
+      sala: c.sala || "",
+      retirou: c.quem || "",
+      porteiro: c.porteiro || "",
+      dataDev: c.dataDevolucao || "",
+      horaDev: c.horaDevolucao || ""
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de chaves 🔑");
+    return;
+  }
+
+  // -------- ORDENAÇÃO (DATA + HORA) --------
+  function parseDataHora(d, h) {
+    if (!d) return new Date(0);
+    const p = d.split("/");
+    return new Date(
+      Number(p[2]),
+      Number(p[1]) - 1,
+      Number(p[0]),
+      ...(h ? h.split(":").map(Number) : [0,0])
+    );
+  }
+
+  lista.sort((a, b) => {
+    return parseDataHora(a.dataRetirada, a.horaRetirada) -
+           parseDataHora(b.dataRetirada, b.horaRetirada);
+  });
+
+  // -------- EXCEL --------
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet("Controle de Chaves", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  // TÍTULO
+  ws.mergeCells("A1:H1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE CHAVES";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  // COLUNAS (NA ORDEM QUE VOCÊ PEDIU)
+  ws.columns = [
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 12 },
+
+    // 🔑 CHAVE MAIOR
+    { header: "Nº Chave 🔎", key: "numero", width: 22 },
+
+    { header: "Sala / Setor", key: "sala", width: 22 },
+    { header: "Quem Retirou", key: "retirou", width: 22 },
+    { header: "Porteiro Retirada", key: "porteiro", width: 20 },
+    { header: "Data Devolução", key: "dataDev", width: 16 },
+    { header: "Hora Devolução", key: "horaDev", width: 16 }
+  ];
+
+  // CABEÇALHO
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center" };
+
+  headerRow.eachCell(cell => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF0288D1" }
+    };
+    cell.border = {
+      top:{style:"thin"},
+      left:{style:"thin"},
+      bottom:{style:"thin"},
+      right:{style:"thin"}
+    };
+  });
+
+  // -------- FILTRO SÓ NA COLUNA CHAVE --------
+  ws.autoFilter = {
+    from: "C3",
+    to: "C3"
+  };
+
+  // DADOS
+  lista.forEach(l => ws.addRow(l));
+
+  // BORDAS
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = {
+        top:{style:"thin"},
+        left:{style:"thin"},
+        bottom:{style:"thin"},
+        right:{style:"thin"}
+      };
+      cell.alignment = { horizontal: "center" };
+    });
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Relatorio_Controle_Chaves.xlsx");
+}
+
+async function exportarRelatorioJogos() {
+
+  const snapAtivos = await db.ref("jogos_em_uso").once("value");
+  const snapHist = await db.ref("historico_jogos").once("value");
+
+  const ativos = snapAtivos.val() || {};
+  const historico = snapHist.val() || {};
+
+  const lista = [];
+
+  // ATIVOS (em uso)
+  Object.values(ativos).forEach(j => {
+    lista.push({
+      jogo: j.jogo || "",
+      funcionario: j.funcionario || "",
+      autorizador: j.autorizador || "",
+      dataRetirada: j.data || "",
+      horaRetirada: j.hora || "",     // pode estar vazio
+      dataDevolucao: "",
+      horaDevolucao: "",
+      status: "EM USO"
+    });
+  });
+
+  // DEVOLVIDOS (histórico)
+  Object.values(historico).forEach(j => {
+    lista.push({
+      jogo: j.jogo || "",
+      funcionario: j.funcionario || "",
+      autorizador: j.autorizador || "",
+      dataRetirada: j.data || "",
+      horaRetirada: j.hora || "",     // pode estar vazio
+      dataDevolucao: j.dataDevolucao || "",
+      horaDevolucao: j.horaDevolucao || "",
+      status: "DEVOLVIDO"
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de jogos 🎮");
+    return;
+  }
+
+  // ORDENAÇÃO (Data + Hora de retirada)
+  function parseDataHoraBR(d, h) {
+    if (!d) return new Date(0);
+    const p = d.split("/");
+    const hhmm = (h && h.includes(":")) ? h.split(":").map(Number) : [0, 0];
+    return new Date(
+      Number(p[2]),
+      Number(p[1]) - 1,
+      Number(p[0]),
+      hhmm[0] || 0,
+      hhmm[1] || 0
+    );
+  }
+
+  lista.sort((a, b) => {
+    return parseDataHoraBR(a.dataRetirada, a.horaRetirada) -
+           parseDataHoraBR(b.dataRetirada, b.horaRetirada);
+  });
+
+  // EXCEL
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Controle de Jogos", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  // TÍTULO
+  ws.mergeCells("A1:I1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE JOGOS";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  // COLUNAS
+  ws.columns = [
+    { header: "Jogo 🎮", key: "jogo", width: 26 },
+    { header: "Funcionário", key: "funcionario", width: 22 },
+    { header: "Autorizador", key: "autorizador", width: 22 },
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 14 },
+    { header: "Data Devolução", key: "dataDevolucao", width: 14 },
+    { header: "Hora Devolução", key: "horaDevolucao", width: 14 },
+    { header: "Status", key: "status", width: 14 }
+  ];
+
+  // CABEÇALHO (linha 3)
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7B1FA2" } }; // roxo
+    cell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" }
+    };
+  });
+
+
+  // DADOS
+  lista.forEach(item => ws.addRow(item));
+
+  // bordas / alinhamento
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = {
+        top:{style:"thin", color:{argb:"FFDDDDDD"}},
+        left:{style:"thin", color:{argb:"FFDDDDDD"}},
+        bottom:{style:"thin", color:{argb:"FFDDDDDD"}},
+        right:{style:"thin", color:{argb:"FFDDDDDD"}}
+      };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // deixa "EM USO" em destaque
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`H${r}`);
+    if (cellStatus.value === "EM USO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Relatorio_Controle_Jogos.xlsx");
+}
+
+function abrirFormAgendamento() {
+  document.getElementById('formAgendamentoBox').style.display = 'block';
+}
+
+function fecharFormAgendamento() {
+  document.getElementById('formAgendamentoBox').style.display = 'none';
+}
+
+ function limparFormGuarda() {
+  document.getElementById('gu_num').value = "";
+  document.getElementById('gu_quem').value = "";
+  document.getElementById('gu_setor').value = "";
+  document.getElementById('gu_porteiro').value = "";
+}
+
+function salvarGuarda() {
+
+  const gu = {
+    numero: document.getElementById('gu_num').value,
+    quem: document.getElementById('gu_quem').value,
+    setor: document.getElementById('gu_setor').value,
+    porteiro: document.getElementById('gu_porteiro').value,
+    dataRetirada: new Date().toLocaleDateString('pt-BR'),
+    horaRetirada: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+  };
+
+  if (!gu.numero || !gu.quem) {
+    mostrarAviso("Informe nº e quem retirou ⚠️");
+    return;
+  }
+
+  db.ref('guardachuvas_em_uso').push(gu).then(() => {
+    mostrarAviso("Guarda-chuva retirado! ☂️");
+    limparFormGuarda();
+    document.getElementById('formGuarda').style.display='none';
+  });
+}
+
+ db.ref('guardachuvas_em_uso').on('value', snap => {
+
+  const dados = snap.val();
+  let html = "";
+
+  if (dados) {
+    for (let id in dados) {
+
+      html += `
+        <div class="card-chave" style="border-left-color:#546e7a;">
+          <b>☂️ Nº ${dados[id].numero}</b><br>
+
+          <small>
+            Retirou: ${dados[id].quem}
+            | Setor: ${dados[id].setor || "-"}
+          </small><br>
+
+          <small>
+            Porteiro: ${dados[id].porteiro}
+          </small><br>
+
+          <button class="botao devolver"
+                  onclick="devolverGuarda('${id}')">
+            Registrar Devolução
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById('guardasAtivos').innerHTML =
+    html || "<p>Nenhum guarda-chuva em uso.</p>";
+});
+
+function devolverGuarda(id) {
+
+  db.ref('guardachuvas_em_uso/' + id)
+    .once('value')
+    .then(snap => {
+
+      const dados = {
+        ...snap.val(),
+        dataDevolucao: new Date().toLocaleDateString('pt-BR'),
+        horaDevolucao: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+      };
+
+      db.ref('historico_guardachuvas')
+        .push(dados)
+        .then(() => {
+
+          db.ref('guardachuvas_em_uso/' + id).remove();
+
+          mostrarAviso("Guarda-chuva devolvido! ✅");
+        });
+    });
+}
+
+   async function exportarRelatorioGuarda() {
+
+  const snapAtivos = await db.ref("guardachuvas_em_uso").once("value");
+  const snapHist = await db.ref("historico_guardachuvas").once("value");
+
+  const ativos = snapAtivos.val() || {};
+  const historico = snapHist.val() || {};
+
+  const lista = [];
+
+  // EM USO
+  Object.values(ativos).forEach(g => {
+    lista.push({
+      dataRetirada: g.dataRetirada || "",
+      horaRetirada: g.horaRetirada || "",
+      dataDevolucao: "",
+      horaDevolucao: "",
+      numero: g.numero || "",
+      retirou: g.quem || "",
+      setor: g.setor || "",
+      porteiro: g.porteiro || "",
+      status: "EM USO"
+    });
+  });
+
+  // DEVOLVIDOS
+  Object.values(historico).forEach(g => {
+    lista.push({
+      dataRetirada: g.dataRetirada || "",
+      horaRetirada: g.horaRetirada || "",
+      dataDevolucao: g.dataDevolucao || "",
+      horaDevolucao: g.horaDevolucao || "",
+      numero: g.numero || "",
+      retirou: g.quem || "",
+      setor: g.setor || "",
+      porteiro: g.porteiro || "",
+      status: "DEVOLVIDO"
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de guarda-chuva ☂️");
+    return;
+  }
+
+  // Ordena por Data/Hora de retirada
+  function parseDataHora(d, h) {
+    if (!d) return new Date(0);
+    const p = d.split("/");
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    return new Date(
+      Number(p[2]),
+      Number(p[1]) - 1,
+      Number(p[0]),
+      hhmmss[0] || 0,
+      hhmmss[1] || 0,
+      hhmmss[2] || 0
+    );
+  }
+
+  lista.sort((a, b) =>
+    parseDataHora(a.dataRetirada, a.horaRetirada) -
+    parseDataHora(b.dataRetirada, b.horaRetirada)
+  );
+
+  // EXCEL
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  // ✅ NOME CERTO DA ABA
+  const ws = wb.addWorksheet("Guarda-Chuva", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  // TÍTULO
+  ws.mergeCells("A1:I1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE GUARDA-CHUVA";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  // ✅ COLUNAS NA ORDEM QUE VOCÊ QUER
+  ws.columns = [
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 14 },
+    { header: "Data Devolução", key: "dataDevolucao", width: 14 },
+    { header: "Hora Devolução", key: "horaDevolucao", width: 14 },
+
+    { header: "Nº Patrimônio", key: "numero", width: 16 },
+    { header: "Quem Retirou", key: "retirou", width: 22 },
+    { header: "Setor", key: "setor", width: 20 },
+    { header: "Porteiro", key: "porteiro", width: 18 },
+    { header: "Status", key: "status", width: 14 }
+  ];
+
+  // Cabeçalho (linha 3)
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF546E7A" } };
+    cell.border = {
+      top:{style:"thin"},
+      left:{style:"thin"},
+      bottom:{style:"thin"},
+      right:{style:"thin"}
+    };
+  });
+
+  // Dados
+  lista.forEach(l => ws.addRow(l));
+
+  // Bordas e alinhamento
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = {
+        top:{style:"thin"},
+        left:{style:"thin"},
+        bottom:{style:"thin"},
+        right:{style:"thin"}
+      };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // Destaca EM USO (coluna I agora)
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`I${r}`);
+    if (cellStatus.value === "EM USO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Relatorio_GuardaChuva.xlsx");
+}
+
+async function exportarRelatorioAgendamentosMensal(offsetMes = 0) {
+  const snapAtivos = await db.ref('agendamentos_veiculos').once('value');
+  const snapHist = await db.ref('historico_agendamentos').once('value');
+
+  const ativos = Object.values(snapAtivos.val() || {});
+  const historico = Object.values(snapHist.val() || {});
+
+  // --- calcula início e fim do mês (com offset) ---
+  const hoje = new Date();
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes, 1);
+  inicioMes.setHours(0, 0, 0, 0);
+
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes + 1, 0);
+  fimMes.setHours(23, 59, 59, 999);
+
+  function toDateBRfromISO(iso) {
+    if (!iso || !iso.includes("-")) return iso || "";
+    const p = iso.split("-");
+    return `${p[2]}/${p[1]}/${p[0]}`;
+  }
+
+  function parseISODate(iso) {
+    // iso: yyyy-mm-dd
+    if (!iso || !iso.includes("-")) return null;
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // --- monta lista unificada (ativos + histórico) ---
+  const lista = [];
+
+  ativos.forEach(a => {
+    const dt = parseISODate(a.data);
+    if (!dt) return;
+    if (dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      data: toDateBRfromISO(a.data),
+      hora: a.hora || "",
+      veiculo: a.veiculo || "",
+      destino: a.local || "",
+      condutor: a.quem || "",
+      status: "AGENDADO",
+      dataFinal: "",
+      horaFinal: ""
+    });
+  });
+
+  historico.forEach(a => {
+    const dt = parseISODate(a.data);
+    if (!dt) return;
+    if (dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      data: toDateBRfromISO(a.data),
+      hora: a.hora || "",
+      veiculo: a.veiculo || "",
+      destino: a.local || "",
+      condutor: a.quem || "",
+      status: "CONCLUÍDO",
+      dataFinal: a.dataFinalizacao || "",
+      horaFinal: a.horaFinalizacao || ""
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum agendamento encontrado neste mês 📅");
+    return;
+  }
+
+  // --- ordena por data/hora ---
+  function parseBRDataHora(d, h) {
+    if (!d) return new Date(0);
+    const p = d.split("/");
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    return new Date(
+      Number(p[2]),
+      Number(p[1]) - 1,
+      Number(p[0]),
+      hhmmss[0] || 0,
+      hhmmss[1] || 0,
+      hhmmss[2] || 0
+    );
+  }
+
+  lista.sort((a, b) => parseBRDataHora(a.data, a.hora) - parseBRDataHora(b.data, b.hora));
+
+  // --- ExcelJS ---
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Agendamentos", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  // título + período
+  ws.mergeCells("A1:H1");
+  ws.getCell("A1").value = "RELATÓRIO — AGENDAMENTOS DE VEÍCULOS (MENSAL)";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  function toBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  ws.mergeCells("A2:H2");
+  ws.getCell("A2").value = `Período: ${toBR(inicioMes)} até ${toBR(fimMes)}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { horizontal: "center" };
+
+  ws.columns = [
+    { header: "Data", key: "data", width: 14 },
+    { header: "Hora", key: "hora", width: 12 },
+    { header: "Veículo", key: "veiculo", width: 30 },
+    { header: "Destino", key: "destino", width: 25 },
+    { header: "Condutor", key: "condutor", width: 22 },
+    { header: "Status", key: "status", width: 14 },
+    { header: "Data Finalização", key: "dataFinal", width: 16 },
+    { header: "Hora Finalização", key: "horaFinal", width: 16 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFB8C00" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // destaca AGENDADO
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`F${r}`);
+    if (cellStatus.value === "AGENDADO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+  const nome = offsetMes === -1
+    ? "Relatorio_Agendamentos_Mes_Passado.xlsx"
+    : "Relatorio_Agendamentos_Mes_Atual.xlsx";
+
+  saveAs(new Blob([buffer]), nome);
+}
+
+  async function exportarRelatorioEmpilhadeirasMensal(offsetMes = 0) {
+  const snap = await db.ref('abastecimentos').once('value');
+  const raw = snap.val() || {};
+
+  // início e fim do mês (com offset)
+  const hoje = new Date();
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes, 1);
+  inicioMes.setHours(0, 0, 0, 0);
+
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes + 1, 0);
+  fimMes.setHours(23, 59, 59, 999);
+
+  function parseBRDate(d) {
+    // d: dd/mm/aaaa
+    if (!d || !d.includes("/")) return null;
+    const p = d.split("/");
+    if (p.length !== 3) return null;
+    return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+  }
+
+  // monta lista filtrada por mês
+  const lista = Object.values(raw)
+    .map(i => {
+      const dt = parseBRDate(i.data);
+      return {
+        data: i.data || "",
+        hora: i.hora || "",
+        empilhadeira: i.num ?? "",
+        motorista: i.motorista ?? "",
+        porteiro: i.porteiro ?? "",
+        _dt: dt
+      };
+    })
+    .filter(i => i._dt && i._dt >= inicioMes && i._dt <= fimMes);
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum abastecimento de empilhadeira neste mês 🚜");
+    return;
+  }
+
+  // ordena por data/hora
+  function parseDataHoraBR(d, h) {
+    const dt = parseBRDate(d) || new Date(0);
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    dt.setHours(hhmmss[0] || 0, hhmmss[1] || 0, hhmmss[2] || 0, 0);
+    return dt;
+  }
+
+  lista.sort((a, b) => parseDataHoraBR(a.data, a.hora) - parseDataHoraBR(b.data, b.hora));
+  lista.forEach(i => delete i._dt);
+
+  // ExcelJS
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Empilhadeiras", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  ws.mergeCells("A1:E1");
+  ws.getCell("A1").value = "RELATÓRIO — ABASTECIMENTO DE EMPILHADEIRAS (MENSAL)";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  function toBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  ws.mergeCells("A2:E2");
+  ws.getCell("A2").value = `Período: ${toBR(inicioMes)} até ${toBR(fimMes)}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { horizontal: "center" };
+
+  ws.columns = [
+    { header: "Data", key: "data", width: 14 },
+    { header: "Hora", key: "hora", width: 12 },
+    { header: "Nº Empilhadeira", key: "empilhadeira", width: 16 },
+    { header: "Motorista", key: "motorista", width: 22 },
+    { header: "Porteiro", key: "porteiro", width: 18 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF455A64" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+  const nome = offsetMes === -1
+    ? "Relatorio_Empilhadeiras_Mes_Passado.xlsx"
+    : "Relatorio_Empilhadeiras_Mes_Atual.xlsx";
+
+  saveAs(new Blob([buffer]), nome);
+}
+
+async function exportarRelatorioChavesMensal(offsetMes = 0) {
+
+  const snapHist = await db.ref("historico_chaves").once("value");
+  const snapAtivas = await db.ref("chaves_em_uso").once("value");
+
+  const historico = snapHist.val() || {};
+  const ativas = snapAtivas.val() || {};
+
+  // início e fim do mês (com offset)
+  const hoje = new Date();
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes, 1);
+  inicioMes.setHours(0, 0, 0, 0);
+
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes + 1, 0);
+  fimMes.setHours(23, 59, 59, 999);
+
+  function parseBRDate(d) {
+    if (!d || !d.includes("/")) return null;
+    const p = d.split("/");
+    if (p.length !== 3) return null;
+    return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+  }
+
+  const lista = [];
+
+  // EM USO
+  Object.values(ativas).forEach(c => {
+    const dt = parseBRDate(c.dataRetirada);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: c.dataRetirada || "",
+      horaRetirada: c.horaRetirada || "",
+      numero: c.num || "",
+      sala: c.sala || "",
+      retirou: c.quem || "",
+      porteiro: c.porteiro || "",
+      dataDev: "",
+      horaDev: "",
+      status: "EM USO"
+    });
+  });
+
+  // DEVOLVIDAS
+  Object.values(historico).forEach(c => {
+    const dt = parseBRDate(c.dataRetirada);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: c.dataRetirada || "",
+      horaRetirada: c.horaRetirada || "",
+      numero: c.num || "",
+      sala: c.sala || "",
+      retirou: c.quem || "",
+      porteiro: c.porteiro || "",
+      dataDev: c.dataDevolucao || "",
+      horaDev: c.horaDevolucao || "",
+      status: "DEVOLVIDO"
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de chaves neste mês 🔑");
+    return;
+  }
+
+  // Ordena por data/hora de retirada
+  function parseDataHora(d, h) {
+    const dt = parseBRDate(d) || new Date(0);
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    dt.setHours(hhmmss[0] || 0, hhmmss[1] || 0, hhmmss[2] || 0, 0);
+    return dt;
+  }
+
+  lista.sort((a, b) => parseDataHora(a.dataRetirada, a.horaRetirada) - parseDataHora(b.dataRetirada, b.horaRetirada));
+
+  // ExcelJS
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Chaves", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  ws.mergeCells("A1:I1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE CHAVES (MENSAL)";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  function toBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  ws.mergeCells("A2:I2");
+  ws.getCell("A2").value = `Período: ${toBR(inicioMes)} até ${toBR(fimMes)}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { horizontal: "center" };
+
+  ws.columns = [
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 12 },
+    { header: "Nº Chave", key: "numero", width: 18 },
+    { header: "Sala / Setor", key: "sala", width: 22 },
+    { header: "Quem Retirou", key: "retirou", width: 22 },
+    { header: "Porteiro Retirada", key: "porteiro", width: 20 },
+    { header: "Data Devolução", key: "dataDev", width: 16 },
+    { header: "Hora Devolução", key: "horaDev", width: 16 },
+    { header: "Status", key: "status", width: 12 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0288D1" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  // filtro só na coluna Nº Chave (C)
+  ws.autoFilter = { from: "C3", to: "C3" };
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // destaca EM USO
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`I${r}`);
+    if (cellStatus.value === "EM USO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+  const nome = offsetMes === -1
+    ? "Relatorio_Chaves_Mes_Passado.xlsx"
+    : "Relatorio_Chaves_Mes_Atual.xlsx";
+
+  saveAs(new Blob([buffer]), nome);
+} 
+
+ async function exportarRelatorioGuardaMensal(offsetMes = 0) {
+
+  const snapAtivos = await db.ref("guardachuvas_em_uso").once("value");
+  const snapHist = await db.ref("historico_guardachuvas").once("value");
+
+  const ativos = snapAtivos.val() || {};
+  const historico = snapHist.val() || {};
+
+  // início e fim do mês (com offset)
+  const hoje = new Date();
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes, 1);
+  inicioMes.setHours(0, 0, 0, 0);
+
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes + 1, 0);
+  fimMes.setHours(23, 59, 59, 999);
+
+  function parseBRDate(d) {
+    if (!d || !d.includes("/")) return null;
+    const p = d.split("/");
+    if (p.length !== 3) return null;
+    return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+  }
+
+  const lista = [];
+
+  // EM USO
+  Object.values(ativos).forEach(g => {
+    const dt = parseBRDate(g.dataRetirada);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: g.dataRetirada || "",
+      horaRetirada: g.horaRetirada || "",
+      numero: g.numero || "",
+      retirou: g.quem || "",
+      setor: g.setor || "",
+      porteiro: g.porteiro || "",
+      dataDevolucao: "",
+      horaDevolucao: "",
+      status: "EM USO"
+    });
+  });
+
+  // DEVOLVIDOS
+  Object.values(historico).forEach(g => {
+    const dt = parseBRDate(g.dataRetirada);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: g.dataRetirada || "",
+      horaRetirada: g.horaRetirada || "",
+      numero: g.numero || "",
+      retirou: g.quem || "",
+      setor: g.setor || "",
+      porteiro: g.porteiro || "",
+      dataDevolucao: g.dataDevolucao || "",
+      horaDevolucao: g.horaDevolucao || "",
+      status: "DEVOLVIDO"
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de guarda-chuva neste mês ☂️");
+    return;
+  }
+
+  // Ordena por data/hora retirada
+  function parseDataHora(d, h) {
+    const dt = parseBRDate(d) || new Date(0);
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    dt.setHours(hhmmss[0] || 0, hhmmss[1] || 0, hhmmss[2] || 0, 0);
+    return dt;
+  }
+
+  lista.sort((a, b) =>
+    parseDataHora(a.dataRetirada, a.horaRetirada) -
+    parseDataHora(b.dataRetirada, b.horaRetirada)
+  );
+
+  // ExcelJS
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Guarda-Chuva", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  ws.mergeCells("A1:I1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE GUARDA-CHUVA (MENSAL)";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  function toBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  ws.mergeCells("A2:I2");
+  ws.getCell("A2").value = `Período: ${toBR(inicioMes)} até ${toBR(fimMes)}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { horizontal: "center" };
+
+  // ✅ ORDEM que você definiu antes
+  ws.columns = [
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 14 },
+    { header: "Nº Patrimônio", key: "numero", width: 16 },
+    { header: "Quem Retirou", key: "retirou", width: 22 },
+    { header: "Setor", key: "setor", width: 18 },
+    { header: "Porteiro", key: "porteiro", width: 18 },
+    { header: "Data Devolução", key: "dataDevolucao", width: 14 },
+    { header: "Hora Devolução", key: "horaDevolucao", width: 14 },
+    { header: "Status", key: "status", width: 12 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF546E7A" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  // (Opcional) filtro na coluna Nº Patrimônio (C)
+  ws.autoFilter = { from: "C3", to: "C3" };
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // destaca EM USO
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`I${r}`);
+    if (cellStatus.value === "EM USO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+  const nome = offsetMes === -1
+    ? "Relatorio_GuardaChuva_Mes_Passado.xlsx"
+    : "Relatorio_GuardaChuva_Mes_Atual.xlsx";
+
+  saveAs(new Blob([buffer]), nome);
+}
+
+async function exportarRelatorioJogosMensal(offsetMes = 0) {
+
+  const snapAtivos = await db.ref("jogos_em_uso").once("value");
+  const snapHist = await db.ref("historico_jogos").once("value");
+
+  const ativos = snapAtivos.val() || {};
+  const historico = snapHist.val() || {};
+
+  // início e fim do mês (com offset)
+  const hoje = new Date();
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes, 1);
+  inicioMes.setHours(0, 0, 0, 0);
+
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + offsetMes + 1, 0);
+  fimMes.setHours(23, 59, 59, 999);
+
+  function parseBRDate(d) {
+    if (!d || !d.includes("/")) return null;
+    const p = d.split("/");
+    if (p.length !== 3) return null;
+    return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+  }
+
+  const lista = [];
+
+  // EM USO
+  Object.values(ativos).forEach(j => {
+    const dt = parseBRDate(j.data);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: j.data || "",
+      horaRetirada: j.hora || "",
+      jogo: j.jogo || "",
+      funcionario: j.funcionario || "",
+      autorizador: j.autorizador || "",
+      dataDevolucao: "",
+      horaDevolucao: "",
+      status: "EM USO"
+    });
+  });
+
+  // DEVOLVIDOS
+  Object.values(historico).forEach(j => {
+    const dt = parseBRDate(j.data);
+    if (!dt || dt < inicioMes || dt > fimMes) return;
+
+    lista.push({
+      dataRetirada: j.data || "",
+      horaRetirada: j.hora || "",
+      jogo: j.jogo || "",
+      funcionario: j.funcionario || "",
+      autorizador: j.autorizador || "",
+      dataDevolucao: j.dataDevolucao || "",
+      horaDevolucao: j.horaDevolucao || "",
+      status: "DEVOLVIDO"
+    });
+  });
+
+  if (lista.length === 0) {
+    mostrarAviso("Nenhum registro de jogos neste mês 🎮");
+    return;
+  }
+
+  // ordena por data/hora retirada
+  function parseDataHora(d, h) {
+    const dt = parseBRDate(d) || new Date(0);
+    const hhmmss = (h && h.includes(":")) ? h.split(":").map(Number) : [0,0,0];
+    dt.setHours(hhmmss[0] || 0, hhmmss[1] || 0, hhmmss[2] || 0, 0);
+    return dt;
+  }
+
+  lista.sort((a, b) => parseDataHora(a.dataRetirada, a.horaRetirada) - parseDataHora(b.dataRetirada, b.horaRetirada));
+
+  // ExcelJS
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Portaria Nortefrut";
+  wb.created = new Date();
+
+  const ws = wb.addWorksheet("Jogos", {
+    views: [{ state: "frozen", ySplit: 3 }]
+  });
+
+  ws.mergeCells("A1:H1");
+  ws.getCell("A1").value = "RELATÓRIO — CONTROLE DE JOGOS (MENSAL)";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+  ws.getCell("A1").alignment = { horizontal: "center" };
+
+  function toBR(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  ws.mergeCells("A2:H2");
+  ws.getCell("A2").value = `Período: ${toBR(inicioMes)} até ${toBR(fimMes)}`;
+  ws.getCell("A2").font = { italic: true, size: 11 };
+  ws.getCell("A2").alignment = { horizontal: "center" };
+
+  // colunas (ordem limpa)
+  ws.columns = [
+    { header: "Data Retirada", key: "dataRetirada", width: 14 },
+    { header: "Hora Retirada", key: "horaRetirada", width: 14 },
+    { header: "Jogo", key: "jogo", width: 26 },
+    { header: "Funcionário", key: "funcionario", width: 22 },
+    { header: "Autorizador", key: "autorizador", width: 22 },
+    { header: "Data Devolução", key: "dataDevolucao", width: 14 },
+    { header: "Hora Devolução", key: "horaDevolucao", width: 14 },
+    { header: "Status", key: "status", width: 12 }
+  ];
+
+  const headerRow = ws.getRow(3);
+  headerRow.values = ws.columns.map(c => c.header);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { horizontal: "center", vertical: "middle" };
+  headerRow.height = 20;
+
+  headerRow.eachCell(cell => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7B1FA2" } };
+    cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+  });
+
+  lista.forEach(item => ws.addRow(item));
+
+  ws.eachRow((row, i) => {
+    if (i < 3) return;
+    row.eachCell(cell => {
+      cell.border = { top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"} };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    });
+  });
+
+  // destaca EM USO
+  for (let r = 4; r <= ws.rowCount; r++) {
+    const cellStatus = ws.getCell(`H${r}`);
+    if (cellStatus.value === "EM USO") {
+      cellStatus.font = { bold: true, color: { argb: "FFD32F2F" } };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+
+  const nome = offsetMes === -1
+    ? "Relatorio_Jogos_Mes_Passado.xlsx"
+    : "Relatorio_Jogos_Mes_Atual.xlsx";
+
+  saveAs(new Blob([buffer]), nome);
+}
+
+function configurarAutocomplete(inputId, listaId, opcoes) {
+  const input = document.getElementById(inputId);
+  const lista = document.getElementById(listaId);
+
+  if (!input || !lista) return;
+
+  input.addEventListener("input", function () {
+    const termo = this.value.trim().toUpperCase();
+    lista.innerHTML = "";
+
+    if (!termo) {
+      lista.style.display = "none";
+      return;
+    }
+
+    const resultados = opcoes.filter(nome =>
+      nome.toUpperCase().includes(termo)
+    );
+
+    if (resultados.length === 0) {
+      lista.style.display = "none";
+      return;
+    }
+
+    resultados.forEach(nome => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.textContent = nome;
+
+      item.addEventListener("click", function () {
+        input.value = nome;
+        lista.style.display = "none";
+      });
+
+      lista.appendChild(item);
+    });
+
+    lista.style.display = "block";
+  });
+
+  input.addEventListener("focus", function () {
+    const termo = this.value.trim().toUpperCase();
+    lista.innerHTML = "";
+
+    const resultados = termo
+      ? opcoes.filter(nome => nome.toUpperCase().includes(termo))
+      : opcoes;
+
+    if (resultados.length === 0) {
+      lista.style.display = "none";
+      return;
+    }
+
+    resultados.forEach(nome => {
+      const item = document.createElement("div");
+      item.className = "autocomplete-item";
+      item.textContent = nome;
+
+      item.addEventListener("click", function () {
+        input.value = nome;
+        lista.style.display = "none";
+      });
+
+      lista.appendChild(item);
+    });
+
+    lista.style.display = "block";
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!input.contains(e.target) && !lista.contains(e.target)) {
+      lista.style.display = "none";
+    }
+  });
+}
+
+function configurarAutocompleteChaves() {
+  const inputSala = document.getElementById("ch_sala");
+  const inputNumero = document.getElementById("ch_num");
+  const lista = document.getElementById("lista_chaves_setor");
+
+  if (!inputSala || !inputNumero || !lista) return;
+
+  async function renderResultados(termo) {
+    lista.innerHTML = "";
+
+    const snap = await db.ref("chaves_em_uso").once("value");
+    const emUso = Object.values(snap.val() || {});
+
+    const numerosEmUso = emUso.map(item => String(item.num));
+
+    const chavesDisponiveis = chavesCadastradas.filter(item =>
+      !numerosEmUso.includes(String(item.numero))
+    );
+
+    const busca = termo.trim().toUpperCase();
+
+    const resultados = busca
+      ? chavesDisponiveis.filter(item =>
+          item.sala.toUpperCase().includes(busca) ||
+          item.numero.toString().includes(busca)
+        )
+      : chavesDisponiveis;
+
+    if (resultados.length === 0) {
+      lista.style.display = "none";
+      return;
+    }
+
+    resultados.forEach(item => {
+      const option = document.createElement("div");
+      option.className = "autocomplete-item";
+      option.innerHTML = `<b>${item.numero}</b> - ${item.sala}`;
+
+      option.addEventListener("click", function () {
+        inputSala.value = item.sala;
+        inputNumero.value = item.numero;
+        lista.style.display = "none";
+      });
+
+      lista.appendChild(option);
+    });
+
+    lista.style.display = "block";
+  }
+
+  inputSala.addEventListener("input", function () {
+    inputNumero.value = "";
+    renderResultados(this.value);
+  });
+
+  inputSala.addEventListener("focus", function () {
+    renderResultados(this.value);
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!inputSala.contains(e.target) && !lista.contains(e.target)) {
+      lista.style.display = "none";
+    }
+  });
+}
+
+function salvarAbastecimento() {
+  const num = document.getElementById('ab_num').value;
+  const motorista = document.getElementById('ab_motorista').value.trim();
+  const porteiro = document.getElementById('ab_porteiro').value.trim();
+
+  if (!num || !motorista || !porteiro) {
+    mostrarAviso("Preencha todos os campos! ⚠️");
+    return;
+  }
+
+  const dados = {
+    num,
+    motorista: motorista.toUpperCase(),
+    porteiro: porteiro.toUpperCase(),
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR', { hour12: false })
+  };
+
+  db.ref('abastecimentos').push(dados).then(() => {
+    mostrarAviso("Abastecimento registrado! 🚜");
+
+    cancelarFormEmpilhadeira();
+  });
+}
+
+function abrirFormEmpilhadeira() {
+  document.getElementById('formAbast').style.display = 'block';
+
+  document.getElementById('ab_num').value = "";
+  document.getElementById('ab_motorista').value = "";
+  document.getElementById('ab_porteiro').value = "";
+}
+
+function cancelarFormEmpilhadeira() {
+  document.getElementById('formAbast').style.display = 'none';
+
+  document.getElementById('ab_num').value = "";
+  document.getElementById('ab_motorista').value = "";
+  document.getElementById('ab_porteiro').value = "";
+}
+
+    </script>
+</body>
+</html>
