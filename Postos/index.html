@@ -342,40 +342,63 @@
       <div class="text-center mb-8 sm:mb-12">
        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">Bem-vindo aos <span class="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Postos Credenciados</span> <br class="hidden sm:block"><span class="text-2xl sm:text-3xl lg:text-4xl">Covre &amp; Cia LTDA</span></h1>
        <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">Encontre os melhores postos para abastecimento e registre suas viagens com facilidade</p>
-      </div><!-- Main Action Buttons -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6"><!-- Button 1: Buscar por Cidade --> <button onclick="showDashboard()" class="group relative bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl p-6 sm:p-8 text-white text-left overflow-hidden transition-all hover:shadow-2xl hover:scale-105 transform active:scale-95">
-        <div class="absolute bottom-0 left-0 w-40 h-40 bg-white opacity-5 rounded-full -ml-20 -mb-20 group-hover:scale-150 transition-transform duration-300"></div>
-        <div class="relative z-10">
-         <div class="h-12 w-12 sm:h-14 sm:w-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-colors">
-          <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+      </div><!-- Home Summary -->
+      <div class="max-w-5xl mx-auto w-full space-y-4 sm:space-y-5">
+       <div class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-lg p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+         <div>
+          <p class="text-xs font-bold tracking-[0.28em] uppercase text-slate-400 mb-2">Meu resumo</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Seus últimos abastecimentos</h2>
+          <p class="text-sm sm:text-base text-slate-500 mt-1">Visualize o histórico da sua conta e acesse rapidamente as ações principais.</p>
          </div>
-         <h2 class="text-xl sm:text-2xl font-bold mb-2">Buscar por Cidade</h2>
-         <p class="text-green-100 text-sm sm:text-base">Encontre postos na sua região</p>
-         <div class="mt-4 flex items-center gap-2 text-green-200 group-hover:translate-x-2 transition-transform">
-          <span class="text-sm sm:text-base font-medium">Explorar</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+         <div class="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <button onclick="showDashboard()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-3 transition-all shadow-lg shadow-emerald-600/20">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+           </svg>
+           Buscar
+          </button>
+          <button onclick="openFuelFormMenu()" class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-3 transition-all shadow-lg shadow-rose-600/20">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+           </svg>
+           Abastecer
+          </button>
+         </div>
+        </div>
+        <div id="home-records-summary" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left">
+          <span class="block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Registros</span>
+          <strong class="mt-2 block text-2xl font-bold text-slate-900">0</strong>
+         </div>
+         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left">
+          <span class="block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Total em litros</span>
+          <strong class="mt-2 block text-2xl font-bold text-slate-900">0,00</strong>
+         </div>
+         <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left">
+          <span class="block text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Total abastecido</span>
+          <strong class="mt-2 block text-2xl font-bold text-slate-900">R$ 0,00</strong>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white/90 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-lg p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+         <div>
+          <p class="text-xs font-bold tracking-[0.28em] uppercase text-slate-400 mb-1">Histórico recente</p>
+          <h3 class="text-lg sm:text-xl font-bold text-slate-900">Abastecimentos da sua conta</h3>
+         </div>
+         <button onclick="openAuthPanel()" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-800">
+          Ver todos
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
-         </div>
-        </div></button> <!-- Button 2: Registrar Abastecimento --> <button onclick="openFuelFormMenu()" class="group relative bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl p-6 sm:p-8 text-white text-left overflow-hidden transition-all hover:shadow-2xl hover:scale-105 transform active:scale-95">
-        <div class="absolute top-0 left-0 w-40 h-40 bg-white opacity-5 rounded-full -ml-20 -mt-20 group-hover:scale-150 transition-transform duration-300"></div>
-        <div class="relative z-10">
-         <div class="h-12 w-12 sm:h-14 sm:w-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-opacity-30 transition-colors">
-          <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-         </div>
-         <h2 class="text-xl sm:text-2xl font-bold mb-2">Registrar Abastecimento</h2>
-         <p class="text-red-100 text-sm sm:text-base">Preencha o formulário e envie</p>
-         <div class="mt-4 flex items-center gap-2 text-red-200 group-hover:translate-x-2 transition-transform">
-          <span class="text-sm sm:text-base font-medium">Registrar</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-         </div>
-        </div></button>
+         </button>
+        </div>
+        <div id="home-records-list" class="space-y-3">
+         <div class="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">Entre com sua conta para visualizar seus abastecimentos.</div>
+        </div>
+       </div>
       </div>
      </div>
     </div><!-- City Grid View -->
