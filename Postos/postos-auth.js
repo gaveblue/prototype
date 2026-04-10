@@ -96,6 +96,29 @@
     }
   }
 
+  function getPreferredRedirectUrl() {
+    const origin = window.location.origin;
+    const pathname = window.location.pathname || '';
+
+    if (pathname.indexOf('/prototype/Postos') !== -1) {
+      return `${origin}/prototype/Postos/`;
+    }
+
+    if (pathname.indexOf('/Postos') !== -1) {
+      return `${origin}/Postos/`;
+    }
+
+    if (pathname.endsWith('/index.html')) {
+      return origin + pathname.replace(/index\.html$/, '');
+    }
+
+    if (pathname.endsWith('/')) {
+      return origin + pathname;
+    }
+
+    return origin + pathname + '/';
+  }
+
   function safeText(value, fallback) {
     if (value === null || value === undefined || value === '') {
       return fallback || '';
@@ -491,7 +514,7 @@
       await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + window.location.pathname
+          redirectTo: getPreferredRedirectUrl()
         }
       });
     } catch (error) {
@@ -687,8 +710,8 @@
       currentSession = null;
       currentProfile = null;
       updateAuthUi();
-      updateGateStatus('Não foi possível concluir o login. Tente novamente.');
-      showAuthError('Não foi possível concluir o login com Google.');
+      updateGateStatus(`Falha no retorno do login: ${authError}`);
+      showAuthError(`Não foi possível concluir o login com Google: ${authError}`);
       clearAuthParamsFromUrl();
       return;
     }
